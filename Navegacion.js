@@ -17,6 +17,7 @@ import Atracciones from './Screen/Atracciones';  // Nueva pantalla
 import Restaurantes from './Screen/Restaurantes';  // Nueva pantalla
 import Bares from './Screen/Bares';  // Nueva pantalla
 import maps from './Screen/Mapa';
+import Login from './Screen/Login';
 
 const Tab = createBottomTabNavigator();
 
