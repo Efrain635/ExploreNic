@@ -11,11 +11,12 @@ import Home from './Screen/Home';
 import Users from './Screen/Users';
 import DetailHome from './Screen/DetailHome';
 import AnotherDetailHome from './Screen/AnotherDetailsHome';
-import Alojamiento from './Screen/Alojamiento';  // Nueva pantalla
+import Alojamiento from '../ExploreNic/Screen/Alojamiento';  // Nueva pantalla
 import AlquilerCoches from './Screen/AlquilerCoches';  // Nueva pantalla
 import Atracciones from './Screen/Atracciones';  // Nueva pantalla
 import Restaurantes from './Screen/Restaurantes';  // Nueva pantalla
 import Bares from './Screen/Bares';  // Nueva pantalla
+import maps from './Screen/Mapa';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,61 +31,27 @@ function MyTabs() {
 
       <Tab.Screen name='Menú' component={StackDetailHome}
         options={{
-          tabBarLabel: 'HomeSreen',
+          tabBarLabel: 'Menú',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="home" size={30} color="black" />
           ),
         }}
       />
 
-      <Tab.Screen name='Alojamiento' component={Alojamiento}
+      <Tab.Screen name='Maps' component={maps}
         options={{
-          tabBarLabel: 'Alojamiento',
+          tabBarLabel: 'Mapa',
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="bed" size={30} color="black" />
+            <FontAwesome name="map" size={28} color="black" />
           ),
-        }}
-      />
+       }}
+     />
 
-      <Tab.Screen name='AlquilerCoches' component={AlquilerCoches}
-        options={{
-          tabBarLabel: 'Alquiler de Coches',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="car" size={30} color="black" />
-          ),
-        }}
-      />
-
-      <Tab.Screen name='Atracciones' component={Atracciones}
-        options={{
-          tabBarLabel: 'Atracciones',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="camera" size={30} color="black" />
-          ),
-        }}
-      />
-
-      <Tab.Screen name='Restaurantes' component={Restaurantes}
-        options={{
-          tabBarLabel: 'Restaurantes',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="cutlery" size={30} color="black" />
-          ),
-        }}
-      />
-
-      <Tab.Screen name='Bares' component={Bares}
-        options={{
-          tabBarLabel: 'Bares',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="glass" size={30} color="black" />
-          ),
-        }}
-      />
-
+      
+      
       <Tab.Screen name='Setting' component={Settings}
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: 'Cofiguraión',
           tabBarIcon: ({ color, size }) => (
             <Fontisto name="player-settings" size={28} color="black" />
           ),
@@ -109,18 +76,52 @@ function StackDetailHome() {
   return (
     <DetailHomeNavigator.Navigator
       initialRouteName='Categorías'>
+      
       <DetailHomeNavigator.Screen
         name="Categorías"
         component={Home}>
       </DetailHomeNavigator.Screen>
+
       <DetailHomeNavigator.Screen
         name="DetailHome"
         component={DetailHome}>
       </DetailHomeNavigator.Screen>
+
       <DetailHomeNavigator.Screen
         name="AnotherDetailHome"
         component={AnotherDetailHome}>
       </DetailHomeNavigator.Screen>
+
+      {/* Añadiendo la pantalla Alojamiento */}
+      <DetailHomeNavigator.Screen
+        name="AlojamientoScreen"
+        component={Alojamiento}>
+      </DetailHomeNavigator.Screen>
+
+      {/* Añadiendo la pantalla Atracciones */}
+      <DetailHomeNavigator.Screen
+        name="AtraccionesScreen"
+        component={Atracciones}>
+      </DetailHomeNavigator.Screen>
+
+      {/* Añadiendo la pantalla Atracciones */}
+      <DetailHomeNavigator.Screen
+        name="RestaurantesScreen"
+        component={Restaurantes}>
+      </DetailHomeNavigator.Screen>
+
+      {/* Añadiendo la pantalla Atracciones */}
+      <DetailHomeNavigator.Screen
+        name="AlquilerScreen"
+        component={AlquilerCoches}>
+      </DetailHomeNavigator.Screen>
+
+      {/* Añadiendo la pantalla Atracciones */}
+      <DetailHomeNavigator.Screen
+        name="BaresScreen"
+        component={Bares}>
+      </DetailHomeNavigator.Screen>
+
     </DetailHomeNavigator.Navigator>
   );
 }
