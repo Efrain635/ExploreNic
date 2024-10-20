@@ -1,10 +1,9 @@
 import * as React from 'react';
-import Login from './Screen/Login';
+import Navegacion from './Navegacion';
 
 export default function App() {
   return(
-    
-    <Login>
-    </Login>
+    <Navegacion>
+    </Navegacion>
   )
 }

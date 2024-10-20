@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Feather from '@expo/vector-icons/Feather';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 import Settings from './Screen/Settings';
 import Home from './Screen/Home';
@@ -16,7 +17,8 @@ import AlquilerCoches from './Screen/AlquilerCoches';  // Nueva pantalla
 import Atracciones from './Screen/Atracciones';  // Nueva pantalla
 import Restaurantes from './Screen/Restaurantes';  // Nueva pantalla
 import Bares from './Screen/Bares';  // Nueva pantalla
-import maps from './Screen/Mapa'; // Opcion de Mapa
+import maps from './Screen/Mapa';
+import RegistroNegocio from './Screen/RegistroNegocio';  // Nueva pantalla
 import Login from './Screen/Login';
 
 const Tab = createBottomTabNavigator();
@@ -55,6 +57,15 @@ function MyTabs() {
           tabBarLabel: 'Cofiguraión',
           tabBarIcon: ({ color, size }) => (
             <Fontisto name="player-settings" size={28} color="black" />
+          ),
+        }}
+      />
+
+      <Tab.Screen name='RegistroNegocio' component={RegistroNegocio}
+        options={{
+          tabBarLabel: 'RegistrarNegocio',
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="solution1" size={24} color="black" />
           ),
         }}
       />
@@ -99,28 +110,34 @@ function StackDetailHome() {
         component={Alojamiento}>
       </DetailHomeNavigator.Screen>
 
-      {/* Añadiendo la pantalla Atracciones */}
+      {/* Añadiendo la pantalla Home */}
       <DetailHomeNavigator.Screen
         name="AtraccionesScreen"
         component={Atracciones}>
       </DetailHomeNavigator.Screen>
 
-      {/* Añadiendo la pantalla Atracciones */}
+      {/* Añadiendo la pantalla Restauranteas */}
       <DetailHomeNavigator.Screen
         name="RestaurantesScreen"
         component={Restaurantes}>
       </DetailHomeNavigator.Screen>
 
-      {/* Añadiendo la pantalla Atracciones */}
+      {/* Añadiendo la pantalla AlquilerCoches */}
       <DetailHomeNavigator.Screen
         name="AlquilerScreen"
         component={AlquilerCoches}>
       </DetailHomeNavigator.Screen>
 
-      {/* Añadiendo la pantalla Atracciones */}
+      {/* Añadiendo la pantalla Bares */}
       <DetailHomeNavigator.Screen
         name="BaresScreen"
         component={Bares}>
+      </DetailHomeNavigator.Screen>
+
+      {/* Añadiendo la pantalla Bares */}
+      <DetailHomeNavigator.Screen
+        name="RegistroNegocioScreen"
+        component={RegistroNegocio}>
       </DetailHomeNavigator.Screen>
 
     </DetailHomeNavigator.Navigator>
