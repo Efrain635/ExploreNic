@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, StyleSheet, Image, Alert, Dimensions } from 'react-native';
 import { auth } from "../../ExploreNic/database/firebaseconfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import OpciondeCrearUsuario from './OpciondeCrearUsuario';
+
+import { useNavigation } from '@react-navigation/native';
 
 // Obtener dimensiones de la pantalla
 const { width, height } = Dimensions.get('window');
 
-export default function LoginScreen({ navigation }) {
+
+export default function Login() {
+  const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,7 +37,7 @@ export default function LoginScreen({ navigation }) {
     try {
       // Iniciar sesión con Firebase Authentication
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('AgroSense'); // Cambiado de 'Home' a 'AgroSense'
+      navigation.navigate('Home'); // Cambiado de 'Home' a 'AgroSense'
     } catch (error) {
       console.error('Error en el inicio de sesión:', error);
       Alert.alert('Error', 'No se pudo iniciar sesión. Verifique sus credenciales.');
@@ -42,6 +47,7 @@ export default function LoginScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Iniciar Sesión</Text>
+      
 
       {/* Campo Correo */}
       <View style={[styles.inputContainer, emailError && styles.inputError]}>
@@ -63,16 +69,21 @@ export default function LoginScreen({ navigation }) {
           value={password}
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
-          placeholderTextColor="#4A6B3E"
+          placeholderTextColor="#00000"
         />
         <TouchableOpacity onPress={togglePasswordVisibility}>
         </TouchableOpacity>
       </View>
 
       {/* Botón de Iniciar */}
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MyTabs')}>
         <Text style={styles.buttonText}>Iniciar</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.createAccountButton} onPress={() => navigation.navigate('OpciondeCrearUsuario')}>
+       <Text style={styles.buttonText}>Crear Cuenta de Usuario</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -83,14 +94,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: width * 0.05, // Ajuste de padding basado en el ancho de la pantalla
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFF",
   },
+
   title: {
     fontSize: width * 0.08, // Ajuste de tamaño de fuente basado en el ancho de la pantalla
     fontWeight: "bold",
     marginBottom: height * 0.05, // Ajuste de márgenes basado en la altura de la pantalla
-    color: "#4A6B3E",
+    color: "#0067C6",
   },
+
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -98,40 +111,56 @@ const styles = StyleSheet.create({
     height: height * 0.07, // Ajuste de altura del campo de texto basado en la altura de la pantalla
     paddingHorizontal: width * 0.03,
     borderWidth: 2,
-    borderColor: "#9EAD6E",
+    borderColor: "#0067C6",
     borderRadius: 25,
     marginBottom: height * 0.02,
   },
+
   inputError: {
     borderColor: "red",
   },
+
   icon: {
     width: width * 0.06, // Ajuste del tamaño del ícono basado en el ancho de la pantalla
     height: width * 0.06,
     marginRight: width * 0.03,
   },
+
   input: {
     flex: 1,
     height: "100%",
     fontSize: width * 0.04, // Ajuste de tamaño de fuente basado en el ancho de la pantalla
     paddingLeft: 10,
-    color: "#4A6B3E",
+    color: "#0067C6",
   },
+
   button: {
     width: "85%",
     height: height * 0.07, // Ajuste de altura del botón basado en la altura de la pantalla
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#4A6B3E",
+    backgroundColor: "#0067C6",
     borderRadius: 25,
   },
+
   buttonText: {
     color: "#fff",
     fontSize: width * 0.05, // Ajuste de tamaño de fuente basado en el ancho de la pantalla
     fontWeight: "bold",
   },
+
+  createAccountButton: {
+    width: "85%",
+    height: height * 0.07, // Ajuste de altura del botón basado en la altura de la pantalla
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0067C6",
+    borderRadius: 45,
+  },
+
   eyeIconImage: {
     width: width * 0.06, // Ajuste del tamaño del ícono basado en el ancho de la pantalla
     height: width * 0.06,
   },
+  
 });

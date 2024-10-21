@@ -11,7 +11,7 @@ const UsersScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image 
-          source={{ uri: 'https://example.com/your-profile-image.jpg' }} // Cambia la URL a la imagen del perfil
+          source={{ uri: '' }} // Cambia la URL a la imagen del perfil
           style={styles.profileImage} 
         />
         <Text style={styles.userName}>Maria de los Angeles</Text>
