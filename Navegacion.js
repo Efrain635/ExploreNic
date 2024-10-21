@@ -16,6 +16,7 @@ import Home from './Screen/Home'; // Pantalla de Home
 import Users from './Screen/Users'; // Pantalla de Usuario
 import DetailHome from './Screen/DetailHome';
 import AnotherDetailHome from './Screen/AnotherDetailsHome';
+
 import maps from './Screen/Mapa'; // Pantalla de Maps
 
 //Pantallas
@@ -30,6 +31,16 @@ import Login from './Screen/Login'; // Inicio de Seccion
 import CrearUsuario from './Screen/CrearUsuario'; // Crear Usuario
 import RegistroNegocio from './Screen/CrearUsuariodeNegocio'; // Crear Usurio de Negocio
 import OpciondeCrearUsuario from './Screen/OpciondeCrearUsuario';
+
+
+import Alojamiento from '../ExploreNic/Screen/Alojamiento';  // Nueva pantalla
+import AlquilerCoches from './Screen/AlquilerCoches';  // Nueva pantalla
+import Atracciones from './Screen/Atracciones';  // Nueva pantalla
+import Restaurantes from './Screen/Restaurantes';  // Nueva pantalla
+import Bares from './Screen/Bares';  // Nueva pantalla
+import maps from './Screen/Mapa';
+import RegistroNegocio from './Screen/RegistroNegocio';  // Nueva pantalla
+import Login from './Screen/Login';
 
 
 const Tab = createBottomTabNavigator();
