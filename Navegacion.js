@@ -1,6 +1,5 @@
 import React from 'react';
-
-import {View, Image, StyleSheet, Text} from 'react-native';
+import { View, Image, StyleSheet, Text } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -11,7 +10,7 @@ import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 // Iconos
-import Settings from './Screen/Settings'; // Pantalla de Configuracion
+import Settings from './Screen/Settings'; // Pantalla de Configuración
 import Home from './Screen/Home'; // Pantalla de Home
 import Users from './Screen/Users'; // Pantalla de Usuario
 import DetailHome from './Screen/DetailHome';
@@ -19,28 +18,18 @@ import AnotherDetailHome from './Screen/AnotherDetailsHome';
 
 import maps from './Screen/Mapa'; // Pantalla de Maps
 
-//Pantallas
-import Alojamiento from '../ExploreNic/Screen/Alojamiento';  // Pantalla de Servios de Alojamiento
-import AlquilerCoches from './Screen/AlquilerCoches';  // Pantalla de Servios de Alquiler de Coches
-import Atracciones from './Screen/Atracciones';  // Pantalla de Servios de Atracciones
-import Restaurantes from './Screen/Restaurantes';  // Pantalla de Servios de Restaurantes
-import Bares from './Screen/Bares';  // Pantalla de Servios de Bares
+// Pantallas
+import Alojamiento from '../ExploreNic/Screen/Alojamiento';  // Pantalla de Servicios de Alojamiento
+import AlquilerCoches from './Screen/AlquilerCoches';  // Pantalla de Servicios de Alquiler de Coches
+import Atracciones from './Screen/Atracciones';  // Pantalla de Servicios de Atracciones
+import Restaurantes from './Screen/Restaurantes';  // Pantalla de Servicios de Restaurantes
+import Bares from './Screen/Bares';  // Pantalla de Servicios de Bares
 
-
-import Login from './Screen/Login'; // Inicio de Seccion
+import Login from './Screen/Login'; // Inicio de Sesión
 import CrearUsuario from './Screen/CrearUsuario'; // Crear Usuario
-import RegistroNegocio from './Screen/CrearUsuariodeNegocio'; // Crear Usurio de Negocio
+import RegistroNegocio from './Screen/RegistroNegocio'; // Crear Usuario de Negocio
 import OpciondeCrearUsuario from './Screen/OpciondeCrearUsuario';
 
-
-import Alojamiento from '../ExploreNic/Screen/Alojamiento';  // Nueva pantalla
-import AlquilerCoches from './Screen/AlquilerCoches';  // Nueva pantalla
-import Atracciones from './Screen/Atracciones';  // Nueva pantalla
-import Restaurantes from './Screen/Restaurantes';  // Nueva pantalla
-import Bares from './Screen/Bares';  // Nueva pantalla
-import maps from './Screen/Mapa';
-import RegistroNegocio from './Screen/RegistroNegocio';  // Nueva pantalla
-import Login from './Screen/Login';
 
 
 const Tab = createBottomTabNavigator();
