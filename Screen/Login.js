@@ -9,7 +9,6 @@ import { useNavigation } from '@react-navigation/native';
 // Obtener dimensiones de la pantalla
 const { width, height } = Dimensions.get('window');
 
-
 export default function Login() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
@@ -46,8 +45,14 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
+      {/* Logo agregado */}
+      <Image
+        source={require('../IMAGENES/Logo.png')}  // Asegúrate de tener el logo en esta ruta
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
       <Text style={styles.title}>Iniciar Sesión</Text>
-      
 
       {/* Campo Correo */}
       <View style={[styles.inputContainer, emailError && styles.inputError]}>
@@ -95,6 +100,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: width * 0.05, // Ajuste de padding basado en el ancho de la pantalla
     backgroundColor: "#FFFF",
+  },
+
+  logo: {
+    width: width * 10,  // El logo ocupará el 50% del ancho de la pantalla
+    height: height * 0.3,  // El logo ocupará el 20% de la altura de la pantalla
+    marginBottom: height * 0.03,  // Espacio debajo del logo
   },
 
   title: {
@@ -162,5 +173,4 @@ const styles = StyleSheet.create({
     width: width * 0.06, // Ajuste del tamaño del ícono basado en el ancho de la pantalla
     height: width * 0.06,
   },
-  
 });

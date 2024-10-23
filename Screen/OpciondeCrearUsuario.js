@@ -3,7 +3,6 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import CrearUsuario from './CrearUsuario';
-import CrearUsuariodeNegocio from './CrearUsuariodeNegocio';
 
 export default function OpciondeCrearUsuario() {
   const navigation = useNavigation();
@@ -23,7 +22,7 @@ export default function OpciondeCrearUsuario() {
       <View style={styles.buttonContainer}>
         <Button
           title="Crear Usuario de Negocio"
-          onPress={() => navigation.navigate('CrearUsuariodeNegocio')}
+          onPress={() => navigation.navigate('RegistroNegocio')}
           color="#0067C6"
         />
       </View>

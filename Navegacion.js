@@ -15,7 +15,6 @@ import Home from './Screen/Home'; // Pantalla de Home
 import Users from './Screen/Users'; // Pantalla de Usuario
 import DetailHome from './Screen/DetailHome';
 import AnotherDetailHome from './Screen/AnotherDetailsHome';
-
 import maps from './Screen/Mapa'; // Pantalla de Maps
 
 // Pantallas
@@ -24,13 +23,13 @@ import AlquilerCoches from './Screen/AlquilerCoches';  // Pantalla de Servicios 
 import Atracciones from './Screen/Atracciones';  // Pantalla de Servicios de Atracciones
 import Restaurantes from './Screen/Restaurantes';  // Pantalla de Servicios de Restaurantes
 import Bares from './Screen/Bares';  // Pantalla de Servicios de Bares
+import Guia from './Screen/GuiasTurismo' //Pantalla de Servicio Turista
 
+// Principal
 import Login from './Screen/Login'; // Inicio de Sesión
 import CrearUsuario from './Screen/CrearUsuario'; // Crear Usuario
-import RegistroNegocio from './Screen/RegistroNegocio'; // Crear Usuario de Negocio
-import OpciondeCrearUsuario from './Screen/OpciondeCrearUsuario';
-
-
+import OpciondeCrearUsuario from './Screen/OpciondeCrearUsuario'; //Opcion de Registros
+import RegistroNegocio from './Screen/RegistroNegocio'; //Pantalla de Regitro de Negocio
 
 const Tab = createBottomTabNavigator();
 
@@ -70,15 +69,6 @@ function MyTabs() {
         }}
       />
 
-      <Tab.Screen name='RegistroNegocio' component={RegistroNegocio}
-        options={{
-          tabBarLabel: 'RegistrarNegocio',
-          tabBarIcon: ({ color, size }) => (
-            <AntDesign name="solution1" size={24} color="black" />
-          ),
-        }}
-      />
-
       <Tab.Screen name='Users' component={Users}
         options={{
           tabBarLabel: 'Users',
@@ -114,6 +104,11 @@ function StackHomeLogin() {
       <stackLogin.Screen
         name="CrearUsuario"
         component={CrearUsuario}>
+      </stackLogin.Screen>
+
+      <stackLogin.Screen
+        name="RegistroNegocio"
+        component={RegistroNegocio}>
       </stackLogin.Screen>
 
     </stackLogin.Navigator>
@@ -169,12 +164,6 @@ function StackDetailHome() {
       <DetailHomeNavigator.Screen
         name="BaresScreen"
         component={Bares}>
-      </DetailHomeNavigator.Screen>
-
-      {/* Añadiendo la pantalla Bares */}
-      <DetailHomeNavigator.Screen
-        name="RegistroNegocioScreen"
-        component={RegistroNegocio}>
       </DetailHomeNavigator.Screen>
 
     </DetailHomeNavigator.Navigator>
