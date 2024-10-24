@@ -8,6 +8,7 @@ const categories = [
     { id: '3', title: 'Atracciones', image: require('../IMAGENES/Atracciones.jpg'), screen: 'AtraccionesScreen' },
     { id: '4', title: 'Restaurantes', image: require('../IMAGENES/Restaurantes.jpg'), screen: 'RestaurantesScreen' },
     { id: '5', title: 'Bares', image: require('../IMAGENES/Bares.jpg'), screen: 'BaresScreen' },
+    { id: '6', title: 'Guías Turistos', image: require('../IMAGENES/Guía de Turista.jpg'), screen: 'GuiasTurismoScreen' },
     ];
 
     const Home = () => {

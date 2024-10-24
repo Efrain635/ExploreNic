@@ -23,7 +23,7 @@ import AlquilerCoches from './Screen/AlquilerCoches';  // Pantalla de Servicios 
 import Atracciones from './Screen/Atracciones';  // Pantalla de Servicios de Atracciones
 import Restaurantes from './Screen/Restaurantes';  // Pantalla de Servicios de Restaurantes
 import Bares from './Screen/Bares';  // Pantalla de Servicios de Bares
-import Guia from './Screen/GuiasTurismo' //Pantalla de Servicio Turista
+import GuiasTurismo from './Screen/GuiasTurismo' //Pantalla de Servicio Turista
 
 // Principal
 import Login from './Screen/Login'; // Inicio de Sesión
@@ -164,6 +164,12 @@ function StackDetailHome() {
       <DetailHomeNavigator.Screen
         name="BaresScreen"
         component={Bares}>
+      </DetailHomeNavigator.Screen>
+
+      {/* Añadiendo la pantalla Bares */}
+        <DetailHomeNavigator.Screen
+        name="GuiasTurismoScreen"
+        component={GuiasTurismo}>
       </DetailHomeNavigator.Screen>
 
     </DetailHomeNavigator.Navigator>
