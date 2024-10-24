@@ -4,14 +4,13 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'rea
 const UsersScreen = () => {
   const handleOptionPress = (option) => {
     console.log(`${option} seleccionado`);
-    // Aquí puedes implementar la lógica para cada opción
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Image 
-          source={{ uri: '' }} // Cambia la URL a la imagen del perfil
+          source={{ uri: '' }} 
           style={styles.profileImage} 
         />
         <Text style={styles.userName}>Maria de los Angeles</Text>
