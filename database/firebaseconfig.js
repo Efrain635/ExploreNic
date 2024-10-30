@@ -1,18 +1,16 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCEyEQZ8kw6_69J1xdvWm7_tlZBcE2D33Y",
-  authDomain: "explorenic-60bca.firebaseapp.com",
-  projectId: "explorenic-60bca",
-  storageBucket: "explorenic-60bca.appspot.com",
-  messagingSenderId: "180292086553",
-  appId: "1:180292086553:web:c06c75a8f107dc669f7388"
+  apiKey: "AIzaSyDOjx97YM3c4dHTYfeDsnsQUn7piIBONC4",
+  authDomain: "explorenic-d5f09.firebaseapp.com",
+  projectId: "explorenic-d5f09",
+  storageBucket: "explorenic-d5f09.firebasestorage.app",
+  messagingSenderId: "392042621571",
+  appId: "1:392042621571:web:05a7b4ff0eda3ce899c9b6",
+  measurementId: "G-WHJ66XXR18"
 };
 
 const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
-
-export default db;
+const analytics = getAnalytics(app);

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert, Dimensions } from 'react-native';
-import { CrearUsuario } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../ExploreNic/database/firebaseconfig";
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,7 +14,7 @@ export default function CreateUserAccount() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [country, setCountry] = useState('');
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     if (!name || !email || !password || !confirmPassword || !phoneNumber || !country) {
       Alert.alert('Error', 'Por favor, complete todos los campos.');
       return;
@@ -22,8 +23,17 @@ export default function CreateUserAccount() {
       Alert.alert('Error', 'Las contraseñas no coinciden.');
       return;
     }
-    // Aquí se puede agregar la lógica para crear la cuenta en Firebase
-    Alert.alert('Éxito', 'Cuenta de usuario creada exitosamente.');
+
+    try {
+      // Registrar al usuario en Firebase
+      await createUserWithEmailAndPassword(auth, email, password);
+      Alert.alert('Éxito', 'Cuenta de usuario creada exitosamente.');
+      
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo crear la cuenta. Intente nuevamente.');
+      console.error('Error en la creación de cuenta:', error.message);
+    }
+    
   };
 
   return (
@@ -35,8 +45,6 @@ export default function CreateUserAccount() {
       <TextInput style={styles.input} placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry />
       <TextInput style={styles.input} placeholder="Confirmar Contraseña" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
       <TextInput style={styles.input} placeholder="Número de Celular" value={phoneNumber} onChangeText={setPhoneNumber} keyboardType="phone-pad" />
-      
-      {/* Selector de País (puedes personalizar esto como necesites) */}
       <TextInput style={styles.input} placeholder="Seleccionar País" value={country} onChangeText={setCountry} />
 
       <TouchableOpacity style={styles.button} onPress={handleCreateAccount}>
