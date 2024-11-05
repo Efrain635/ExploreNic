@@ -4,7 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import { db } from '../database/firebaseconfig';
 import { collection, addDoc } from 'firebase/firestore';
 import MapView, { Marker } from 'react-native-maps';
-import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function RegistroNegocio() {
   const [nombre, setNombre] = useState('');
@@ -22,15 +22,20 @@ export default function RegistroNegocio() {
   const handleRegistro = async () => {
     try {
       setCargando(true);
-      await addDoc(collection(db, 'negocios'), {
+  
+      // Usamos el valor de `tipo` para crear la colección correspondiente
+      await addDoc(collection(db, tipo), {
         nombre,
         tipo,
         descripcion,
         ubicacion,
         servicios: serviciosSeleccionados.filter(servicio => servicio !== ''),
-        imagenes,
+        imagenes: imagenes.map(img => img.uri),
       });
+  
       Alert.alert('Éxito', 'Negocio registrado con éxito');
+  
+      // Reiniciamos los campos de entrada
       setNombre('');
       setTipo('Alojamiento');
       setDescripcion('');
@@ -44,6 +49,7 @@ export default function RegistroNegocio() {
       setCargando(false);
     }
   };
+  
 
   const onMapPress = (event) => {
     const { coordinate } = event.nativeEvent;
@@ -58,23 +64,16 @@ export default function RegistroNegocio() {
   };
 
   const seleccionarImagenes = async () => {
-    const options = {
-      mediaType: 'photo',
-      selectionLimit: 0,
-    };
-
-    try {
-      const response = await launchImageLibrary(options);
-      
-      if (response.didCancel) {
-        console.log('El usuario canceló la selección de imágenes');
-      } else if (response.errorCode) {
-        Alert.alert('Error en la selección de imágenes', response.errorMessage);
-      } else {
-        setImagenes(response.assets);
-      }
-    } catch (error) {
-      console.error('Error al seleccionar imágenes:', error);
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsMultipleSelection: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    
+    if (!result.canceled) {
+      setImagenes(result.assets);
+    } else {
       Alert.alert('Error', 'No se pudo seleccionar las imágenes');
     }
   };
@@ -144,7 +143,7 @@ export default function RegistroNegocio() {
       </MapView>
 
       <Button title="Seleccionar Imágenes" onPress={seleccionarImagenes} />
-      
+
       <FlatList
         data={imagenes}
         keyExtractor={(item) => item.uri}
@@ -178,40 +177,31 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  label: {
-    color: '#fff',
-    marginBottom: 10,
-  },
   input: {
-    height: 40,
-    borderColor: '#fff',
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    borderRadius: 5,
     backgroundColor: '#fff',
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 5,
+  },
+  label: {
+    fontSize: 16,
+    color: '#fff',
+    marginVertical: 5,
   },
   picker: {
-    height: 50,
-    borderColor: '#fff',
-    borderWidth: 1,
-    marginBottom: 15,
-    borderRadius: 5,
     backgroundColor: '#fff',
+    marginBottom: 10,
   },
   map: {
-    width: '100%',
-    height: 300,
-    marginBottom: 15,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    alignItems: 'center',
+    height: 200,
+    marginVertical: 10,
   },
   image: {
     width: 100,
     height: 100,
-    marginRight: 10,
-    borderRadius: 5,
+    margin: 5,
+  },
+  buttonContainer: {
+    marginVertical: 20,
   },
 });
