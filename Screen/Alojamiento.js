@@ -1,62 +1,34 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ScrollView, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TextInput, Linking, ActivityIndicator } from 'react-native';
 import { Rating } from 'react-native-ratings';
-import { Linking } from 'react-native';
-
-// Datos de La Posada La Casona de Juigalpa
-const alojamientoDataCasona = {
-  nombre: 'La Posada La Casona de Juigalpa',
-  descripcion: 'Un lugar acogedor en Juigalpa, Chontales, Nicaragua.',
-  servicios: ['Wi-Fi', 'Desayuno', 'Estacionamiento', 'Recepción 24 horas'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0854,-85.2072',
-  },
-  imagenes: [
-    require('../IMAGENES/hotel la casona 1.jpg'),
-    require('../IMAGENES/hotel la casona 2.jpg'),
-    require('../IMAGENES/hotel la casona 3.jpg'),
-  ],
-};
-
-// Datos de Hotel 2 Aries
-const alojamientoDataAries = {
-  nombre: 'Hotel 2 Aries',
-  descripcion: 'Hotel moderno y económico en Juigalpa.',
-  servicios: ['Wi-Fi', 'Piscina', 'Gimnasio', 'Recepción 24 horas'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0865,-85.2083',
-  },
-  imagenes: [
-    require('../IMAGENES/hotel 2 aries 1.jpeg'),
-    require('../IMAGENES/hotel 2 aries 2.jpeg'),
-    require('../IMAGENES/hotel 2 aries 3.jpeg'),
-    require('../IMAGENES/hotel 2 aries 4.jpeg'),
-  ],
-};
-
-// Datos de El Mirador
-const alojamientoDataMirador = {
-  nombre: 'El Mirador',
-  descripcion: 'Hotel con una vista espectacular a las montañas y paisajes naturales.',
-  servicios: ['Wi-Fi', 'Restaurante', 'Piscina', 'Aire acondicionado'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0900,-85.2100',
-  },
-  imagenes: [
-    require('../IMAGENES/El mirador 1.jpeg'),
-    require('../IMAGENES/El mirador 2.jpeg'),
-    require('../IMAGENES/El mirador 3.jpeg'),
-    require('../IMAGENES/El mirador 4.jpeg'),
-  ],
-};
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../database/firebaseconfig'; 
 
 const Alojamiento = () => {
-  const [ratingCasona, setRatingCasona] = useState(4);
-  const [ratingAries, setRatingAries] = useState(4);
-  const [ratingMirador, setRatingMirador] = useState(5); // Inicializamos la valoración para El Mirador
+  const [alojamientos, setAlojamientos] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const alojamientos = [alojamientoDataCasona, alojamientoDataAries, alojamientoDataMirador];
+  // Función para obtener alojamientos desde Firebase
+  const fetchAlojamientos = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'Alojamiento'));
+      const alojamientosData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAlojamientos(alojamientosData);
+    } catch (error) {
+      console.error("Error al obtener alojamientos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAlojamientos();
+  }, []);
 
   // Filtrar los alojamientos según la búsqueda
   const filteredAlojamientos = alojamientos.filter((alojamiento) =>
@@ -71,48 +43,47 @@ const Alojamiento = () => {
     ));
   };
 
-  const renderImagenes = (imagenes) => {
-    return (
-      <FlatList
-        data={imagenes}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Image source={item} style={styles.image} />}
-      />
-    );
-  };
+  const renderImagenes = (imagenes) => (
+    <FlatList
+      data={imagenes}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => <Image source={{ uri: item }} style={styles.image} />}
+    />
+  );
 
-  const renderAlojamiento = (data, rating, setRating) => (
+  const renderAlojamiento = ({ item }) => (
     <View style={styles.alojamientoContainer}>
-      <Text style={styles.title}>{data.nombre}</Text>
-      <Text style={styles.description}>{data.descripcion}</Text>
+      <Text style={styles.title}>{item.nombre}</Text>
+      <Text style={styles.description}>{item.descripcion}</Text>
 
-      <View style={styles.imageContainer}>{renderImagenes(data.imagenes)}</View>
+      <View style={styles.imageContainer}>{renderImagenes(item.imagenes)}</View>
 
       <Text style={styles.sectionTitle}>Servicios Ofrecidos</Text>
-      {renderServicios(data.servicios)}
+      {renderServicios(item.servicios)}
 
       <Text style={styles.sectionTitle}>Ubicación</Text>
-      <Text
-        style={styles.link}
-        onPress={() => Linking.openURL(data.ubicacion.googleMapsUrl)}
-      >
+      <Text style={styles.link} onPress={() => Linking.openURL(item.ubicacion.googleMapsUrl)}>
         Ver en Google Maps
       </Text>
 
       <Text style={styles.sectionTitle}>Valoración</Text>
       <Rating
-        startingValue={rating}
+        startingValue={item.valoracion || 4}
         imageSize={30}
-        onFinishRating={(value) => setRating(value)}
+        readonly
         style={styles.rating}
       />
     </View>
   );
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0067C6" style={{ flex: 1, justifyContent: 'center' }} />;
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <TextInput
         style={styles.searchInput}
         placeholder="Buscar alojamiento..."
@@ -120,25 +91,15 @@ const Alojamiento = () => {
         onChangeText={(text) => setSearchQuery(text)}
       />
       {filteredAlojamientos.length > 0 ? (
-        filteredAlojamientos.map((alojamiento) =>
-          renderAlojamiento(
-            alojamiento,
-            alojamiento === alojamientoDataCasona
-              ? ratingCasona
-              : alojamiento === alojamientoDataAries
-              ? ratingAries
-              : ratingMirador, // Agregamos la valoración para El Mirador
-            alojamiento === alojamientoDataCasona
-              ? setRatingCasona
-              : alojamiento === alojamientoDataAries
-              ? setRatingAries
-              : setRatingMirador // Actualizamos la función de valoración para El Mirador
-          )
-        )
+        <FlatList
+          data={filteredAlojamientos}
+          renderItem={renderAlojamiento}
+          keyExtractor={(item) => item.id}
+        />
       ) : (
         <Text style={styles.noResults}>No se encontraron alojamientos</Text>
       )}
-    </ScrollView>
+    </View>
   );
 };
 

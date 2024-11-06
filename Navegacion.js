@@ -17,6 +17,7 @@ import Users from './Screen/Users'; // Pantalla de Usuario
 import DetailHome from './Screen/DetailHome';
 import AnotherDetailHome from './Screen/AnotherDetailsHome';
 import maps from './Screen/Mapa'; // Pantalla de Maps
+import Estadisticas from './Screen/Estadisticas';
 
 // Pantallas
 import Alojamiento from '../ExploreNic/Screen/Alojamiento';  // Pantalla de Servicios de Alojamiento
@@ -57,6 +58,15 @@ function MyTabs() {
           tabBarLabel: 'Mapa',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="map" size={28} color="black" />
+          ),
+       }}
+     />
+
+      <Tab.Screen name='Estadisticas' component={Estadisticas}
+        options={{
+          tabBarLabel: 'Estadisticas',
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="areachart" size={24} color="black" />
           ),
        }}
      />
