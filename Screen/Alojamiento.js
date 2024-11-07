@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TextInput, Linking, ActivityIndicator } from 'react-native';
 import { Rating } from 'react-native-ratings';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../database/firebaseconfig'; 
 
 const Alojamiento = () => {
@@ -18,6 +18,7 @@ const Alojamiento = () => {
         id: doc.id,
         ...doc.data(),
       }));
+      
       setAlojamientos(alojamientosData);
     } catch (error) {
       console.error("Error al obtener alojamientos:", error);
@@ -35,6 +36,18 @@ const Alojamiento = () => {
     alojamiento.nombre.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Función para actualizar la valoración en Firebase
+  const handleRating = async (alojamientoId, newRating) => {
+    try {
+      const alojamientoRef = doc(db, 'Alojamiento', alojamientoId);
+      await updateDoc(alojamientoRef, {
+        valoracion: newRating, // Actualiza la valoración con la nueva calificación
+      });
+    } catch (error) {
+      console.error("Error al actualizar la valoración:", error);
+    }
+  };
+
   const renderServicios = (servicios) => {
     return servicios.map((servicio, index) => (
       <Text key={index} style={styles.servicio}>
@@ -49,7 +62,13 @@ const Alojamiento = () => {
       horizontal
       showsHorizontalScrollIndicator={false}
       keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => <Image source={{ uri: item }} style={styles.image} />}
+      renderItem={({ item }) => (
+        <Image
+          source={{ uri: item }}
+          style={styles.image}
+          onError={(e) => console.log('Error al cargar imagen:', e.nativeEvent.error, 'URL:', item)}
+        />
+      )}
     />
   );
 
@@ -58,7 +77,9 @@ const Alojamiento = () => {
       <Text style={styles.title}>{item.nombre}</Text>
       <Text style={styles.description}>{item.descripcion}</Text>
 
-      <View style={styles.imageContainer}>{renderImagenes(item.imagenes)}</View>
+      <View style={styles.imageContainer}>
+        {item.imagenes && Array.isArray(item.imagenes) ? renderImagenes(item.imagenes) : <Text>No hay imágenes disponibles</Text>}
+      </View>
 
       <Text style={styles.sectionTitle}>Servicios Ofrecidos</Text>
       {renderServicios(item.servicios)}
@@ -72,7 +93,7 @@ const Alojamiento = () => {
       <Rating
         startingValue={item.valoracion || 4}
         imageSize={30}
-        readonly
+        onFinishRating={(rating) => handleRating(item.id, rating)} // Actualiza la valoración cuando el usuario califique
         style={styles.rating}
       />
     </View>

@@ -1,64 +1,52 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ScrollView, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TextInput, Linking, ActivityIndicator } from 'react-native';
 import { Rating } from 'react-native-ratings';
-import { Linking } from 'react-native';
-
-// Datos de Alquiler Auto 1
-const alquilerData1 = {
-  nombre: 'Auto Compacto Económico',
-  descripcion: 'Un auto compacto ideal para viajes cortos en la ciudad.',
-  servicios: ['Aire acondicionado', 'Kilometraje ilimitado', 'GPS incluido', 'Seguro básico'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0854,-85.2072',
-  },
-  imagenes: [
-    require('../IMAGENES/22.jpeg'),
-    require('../IMAGENES/23.jpeg'),
-    require('../IMAGENES/24.jpeg'),
-  ],
-};
-
-// Datos de Alquiler Auto 2
-const alquilerData2 = {
-  nombre: 'SUV Familiar',
-  descripcion: 'Vehículo ideal para familias y viajes largos.',
-  servicios: ['Wi-Fi', 'Seguro completo', 'Aire acondicionado', 'GPS avanzado'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0865,-85.2083',
-  },
-  imagenes: [
-    require('../IMAGENES/AlquilerCoche1.jpeg'),
-    require('../IMAGENES/AlquilerCoche2.jpeg'),
-    require('../IMAGENES/AlquilerCoche4.jpeg'),
-  ],
-};
-
-// Datos de Alquiler Auto 3
-const alquilerData3 = {
-  nombre: 'Auto Deportivo',
-  descripcion: 'Un auto deportivo para los amantes de la velocidad.',
-  servicios: ['Asientos de cuero', 'Aire acondicionado', 'Seguro completo', 'Kilometraje ilimitado'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0900,-85.2100',
-  },
-  imagenes: [
-    require('../IMAGENES/AlquilerdeCoches3.jpg'),
-    require('../IMAGENES/Lugardearquilerdeautos.jpeg'),
-  ],
-};
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { db } from '../database/firebaseconfig'; 
 
 const AlquilerAutos = () => {
-  const [ratingAuto1, setRatingAuto1] = useState(4);
-  const [ratingAuto2, setRatingAuto2] = useState(5);
-  const [ratingAuto3, setRatingAuto3] = useState(4);
+  const [alquileres, setAlquileres] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const alquileres = [alquilerData1, alquilerData2, alquilerData3];
+  // Función para obtener autos desde Firebase
+  const fetchAlquileres = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'AlquilerAutos'));
+      const alquileresData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setAlquileres(alquileresData);
+    } catch (error) {
+      console.error("Error al obtener autos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAlquileres();
+  }, []);
 
   // Filtrar los autos según la búsqueda
   const filteredAlquileres = alquileres.filter((alquiler) =>
     alquiler.nombre.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Función para actualizar la valoración en Firebase
+  const handleRating = async (autoId, newRating) => {
+    try {
+      const autoRef = doc(db, 'AlquilerAutos', autoId);
+      await updateDoc(autoRef, {
+        valoracion: newRating, // Actualiza la valoración con la nueva calificación
+      });
+    } catch (error) {
+      console.error("Error al actualizar la valoración:", error);
+    }
+  };
 
   const renderServicios = (servicios) => {
     return servicios.map((servicio, index) => (
@@ -68,48 +56,55 @@ const AlquilerAutos = () => {
     ));
   };
 
-  const renderImagenes = (imagenes) => {
-    return (
-      <FlatList
-        data={imagenes}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Image source={item} style={styles.image} />}
-      />
-    );
-  };
+  const renderImagenes = (imagenes) => (
+    <FlatList
+      data={imagenes}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <Image
+          source={{ uri: item }}
+          style={styles.image}
+          onError={(e) => console.log('Error al cargar imagen:', e.nativeEvent.error, 'URL:', item)}
+        />
+      )}
+    />
+  );
 
-  const renderAlquiler = (data, rating, setRating) => (
+  const renderAlquiler = ({ item }) => (
     <View style={styles.alquilerContainer}>
-      <Text style={styles.title}>{data.nombre}</Text>
-      <Text style={styles.description}>{data.descripcion}</Text>
+      <Text style={styles.title}>{item.nombre}</Text>
+      <Text style={styles.description}>{item.descripcion}</Text>
 
-      <View style={styles.imageContainer}>{renderImagenes(data.imagenes)}</View>
+      <View style={styles.imageContainer}>
+        {item.imagenes && Array.isArray(item.imagenes) ? renderImagenes(item.imagenes) : <Text>No hay imágenes disponibles</Text>}
+      </View>
 
-      <Text style={styles.sectionTitle}>Características del Auto</Text>
-      {renderServicios(data.servicios)}
+      <Text style={styles.sectionTitle}>Servicios Ofrecidos</Text>
+      {renderServicios(item.servicios)}
 
       <Text style={styles.sectionTitle}>Ubicación</Text>
-      <Text
-        style={styles.link}
-        onPress={() => Linking.openURL(data.ubicacion.googleMapsUrl)}
-      >
+      <Text style={styles.link} onPress={() => Linking.openURL(item.ubicacion.googleMapsUrl)}>
         Ver en Google Maps
       </Text>
 
       <Text style={styles.sectionTitle}>Valoración</Text>
       <Rating
-        startingValue={rating}
+        startingValue={item.valoracion || 4}
         imageSize={30}
-        onFinishRating={(value) => setRating(value)}
+        onFinishRating={(rating) => handleRating(item.id, rating)} // Actualiza la valoración cuando el usuario califique
         style={styles.rating}
       />
     </View>
   );
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0067C6" style={{ flex: 1, justifyContent: 'center' }} />;
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <TextInput
         style={styles.searchInput}
         placeholder="Buscar auto en alquiler..."
@@ -117,25 +112,15 @@ const AlquilerAutos = () => {
         onChangeText={(text) => setSearchQuery(text)}
       />
       {filteredAlquileres.length > 0 ? (
-        filteredAlquileres.map((alquiler) =>
-          renderAlquiler(
-            alquiler,
-            alquiler === alquilerData1
-              ? ratingAuto1
-              : alquiler === alquilerData2
-              ? ratingAuto2
-              : ratingAuto3,
-            alquiler === alquilerData1
-              ? setRatingAuto1
-              : alquiler === alquilerData2
-              ? setRatingAuto2
-              : setRatingAuto3
-          )
-        )
+        <FlatList
+          data={filteredAlquileres}
+          renderItem={renderAlquiler}
+          keyExtractor={(item) => item.id}
+        />
       ) : (
         <Text style={styles.noResults}>No se encontraron autos en alquiler</Text>
       )}
-    </ScrollView>
+    </View>
   );
 };
 

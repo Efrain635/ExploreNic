@@ -15,7 +15,7 @@ export default function RegistroNegocio() {
     longitude: -85.2072,
   });
   const [markerVisible, setMarkerVisible] = useState(false);
-  const [serviciosSeleccionados, setServiciosSeleccionados] = useState(['', '', '', '', '']);
+  const [serviciosSeleccionados, setServiciosSeleccionados] = useState(['', '']);
   const [imagenes, setImagenes] = useState([]);
   const [cargando, setCargando] = useState(false);
 
@@ -98,27 +98,28 @@ export default function RegistroNegocio() {
         <Picker.Item label="Atracciones" value="Atracciones" />
         <Picker.Item label="Restaurantes" value="Restaurantes" />
         <Picker.Item label="Bares" value="Bares" />
+        <Picker.Item label="Guías turísticos" value="Guías turísticos" />
       </Picker>
 
       <Text style={styles.label}>Servicios ofrecidos:</Text>
-      {serviciosSeleccionados.map((servicio, index) => (
-        <Picker
-          key={index}
-          selectedValue={servicio}
-          onValueChange={(itemValue) => actualizarServicio(index, itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Seleccione un servicio" value="" />
-          <Picker.Item label="Wi-Fi" value="Wi-Fi" />
-          <Picker.Item label="Desayuno" value="Desayuno" />
-          <Picker.Item label="Almuerzo" value="Almuerzo" />
-          <Picker.Item label="Cena" value="Cena" />
-          <Picker.Item label="Estacionamiento" value="Estacionamiento" />
-          <Picker.Item label="Guia turistico" value="Guia turistico" />
-          <Picker.Item label="Recepción 24 horas" value="Recepción 24 horas" />
-          <Picker.Item label="Transporte" value="Transporte" />
-        </Picker>
-      ))}
+
+        {serviciosSeleccionados.map((servicio, index) => (
+          <View key={index} style={styles.serviceContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Escriba un servicio"
+              value={servicio}
+              onChangeText={(text) => actualizarServicio(index, text)}
+            />
+          </View>
+        ))}
+
+        <View style={styles.buttonContainer}>
+          <Button 
+            title="Agregar otro servicio" 
+            onPress={() => setServiciosSeleccionados([...serviciosSeleccionados, ''])} 
+          />
+        </View>
 
       <TextInput
         style={styles.input}
@@ -200,6 +201,12 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 5,
+  },
+  buttonContainer: {
+    marginVertical: 20,
+  },
+  serviceContainer: {
+    marginBottom: 10,
   },
   buttonContainer: {
     marginVertical: 20,

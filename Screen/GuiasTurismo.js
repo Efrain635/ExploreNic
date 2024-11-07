@@ -1,57 +1,34 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ScrollView, TextInput } from 'react-native';
-import { Linking } from 'react-native';
-
-// Datos de los guías turísticos
-const guiaData1 = {
-  nombre: 'Carlos Martínez',
-  descripcion: 'Guía especializado en ecoturismo y recorridos por reservas naturales en Nicaragua.',
-  servicios: ['Tours guiados', 'Excursiones a pie', 'Recorridos personalizados'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.1234,-85.2020',
-  },
-  imagenes: [
-    require('../IMAGENES/GuiasTurismo 1.jpg'),
-    require('../IMAGENES/GuiasTurismo 2.jpg'),
-    require('../IMAGENES/GuiasTurismo 3.jpg'),
-    require('../IMAGENES/GuiasTurismo 4.jpg'),
-  ],
-};
-
-const guiaData2 = {
-  nombre: 'Ana López',
-  descripcion: 'Guía bilingüe con experiencia en recorridos históricos y culturales en Granada y León.',
-  servicios: ['Tours en inglés y español', 'Visitas culturales', 'Recorridos en grupo'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.1256,-85.2067',
-  },
-  imagenes: [
-    require('../IMAGENES/Guias 1.png'),
-    require('../IMAGENES/Guias 2.png'),
-    require('../IMAGENES/Guias 3.jpg'),
-    require('../IMAGENES/Guias 4.jpg'),
-  ],
-};
-
-const guiaData3 = {
-  nombre: 'Juan Pérez',
-  descripcion: 'Guía local experto en turismo de aventura y actividades al aire libre.',
-  servicios: ['Rutas de senderismo', 'Escalada', 'Actividades al aire libre'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.1289,-85.2098',
-  },
-  imagenes: [
-    require('../IMAGENES/Turismo 1.jpg'),
-    require('../IMAGENES/Turismo 2.jpg'),
-    require('../IMAGENES/Turismo 3.jpg'),
-    require('../IMAGENES/Turismo 4.jpg'),
-  ],
-};
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, ScrollView, TextInput, Linking, ActivityIndicator } from 'react-native';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../database/firebaseconfig'; 
 
 const GuiasTurismo = () => {
+  const [guias, setGuias] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const guias = [guiaData1, guiaData2, guiaData3];
+  // Función para obtener los guías turísticos desde Firebase
+  const fetchGuias = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'Guías turísticos'));
+      const guiasData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      
+      setGuias(guiasData);
+    } catch (error) {
+      console.error("Error al obtener guías:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGuias();
+  }, []);
 
   // Filtrar los guías turísticos según la búsqueda
   const filteredGuias = guias.filter((guia) =>
@@ -73,30 +50,36 @@ const GuiasTurismo = () => {
         horizontal
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Image source={item} style={styles.image} />}
+        renderItem={({ item }) => <Image source={{ uri: item }} style={styles.image} />}
       />
     );
   };
 
-  const renderGuia = (data) => (
+  const renderGuia = ({ item }) => (
     <View style={styles.guiaContainer}>
-      <Text style={styles.title}>{data.nombre}</Text>
-      <Text style={styles.description}>{data.descripcion}</Text>
+      <Text style={styles.title}>{item.nombre}</Text>
+      <Text style={styles.description}>{item.descripcion}</Text>
 
-      <View style={styles.imageContainer}>{renderImagenes(data.imagenes)}</View>
+      <View style={styles.imageContainer}>
+        {item.imagenes && Array.isArray(item.imagenes) ? renderImagenes(item.imagenes) : <Text>No hay imágenes disponibles</Text>}
+      </View>
 
       <Text style={styles.sectionTitle}>Servicios Ofrecidos</Text>
-      {renderServicios(data.servicios)}
+      {renderServicios(item.servicios)}
 
       <Text style={styles.sectionTitle}>Ubicación</Text>
       <Text
         style={styles.link}
-        onPress={() => Linking.openURL(data.ubicacion.googleMapsUrl)}
+        onPress={() => Linking.openURL(item.ubicacion.googleMapsUrl)}
       >
         Ver en Google Maps
       </Text>
     </View>
   );
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0067C6" style={{ flex: 1, justifyContent: 'center' }} />;
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -107,7 +90,11 @@ const GuiasTurismo = () => {
         onChangeText={(text) => setSearchQuery(text)}
       />
       {filteredGuias.length > 0 ? (
-        filteredGuias.map((guia) => renderGuia(guia))
+        <FlatList
+          data={filteredGuias}
+          renderItem={renderGuia}
+          keyExtractor={(item) => item.id}
+        />
       ) : (
         <Text style={styles.noResults}>No se encontraron guías turísticos</Text>
       )}

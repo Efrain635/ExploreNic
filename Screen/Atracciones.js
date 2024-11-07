@@ -1,81 +1,194 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TextInput, Linking, ActivityIndicator } from 'react-native';
+import { Rating } from 'react-native-ratings';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { db } from '../database/firebaseconfig'; 
 
-// Datos de atracciones turísticas
-const atracciones = [
-  {
-    id: '1',
-    nombre: 'Volcán Masaya',
-    descripcion: 'Uno de los volcanes más activos en Nicaragua, con impresionantes vistas.',
-    imagen: require('../IMAGENES/Atracciones/descarga (1).jpeg'), // Asegúrate de tener esta imagen en tu proyecto
-  },
-  {
-    id: '2',
-    nombre: 'Islas del Maíz',
-    descripcion: 'Un conjunto de islas paradisiacas con playas hermosas y actividades acuáticas.',
-    imagen: require('../IMAGENES/Atracciones/descarga (2).jpeg'),
-  },
-  {
-    id: '3',
-    nombre: 'Granada',
-    descripcion: 'Ciudad colonial famosa por su arquitectura y cultura histórica.',
-    imagen: require('../IMAGENES/Atracciones/descarga.jpeg'),
-  },
-];
+const Atracciones = () => {
+  const [atracciones, setAtracciones] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
-export default function Atracciones() {
-  const renderAtraccion = ({ item }) => (
-    <View style={styles.atraccionContainer}>
-      <Image source={item.imagen} style={styles.imagen} />
-      <Text style={styles.nombre}>{item.nombre}</Text>
-      <Text style={styles.descripcion}>{item.descripcion}</Text>
-    </View>
+  // Función para obtener atracciones desde Firebase
+  const fetchAtracciones = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'Atracciones'));
+      const atraccionesData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      
+      setAtracciones(atraccionesData);
+    } catch (error) {
+      console.error("Error al obtener atracciones:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAtracciones();
+  }, []);
+
+  // Filtrar las atracciones según la búsqueda
+  const filteredAtracciones = atracciones.filter((atraccion) =>
+    atraccion.nombre.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>Atracciones Turísticas</Text>
-      <FlatList
-        data={atracciones}
-        renderItem={renderAtraccion}
-        keyExtractor={(item) => item.id}
+  // Función para actualizar la valoración en Firebase
+  const handleRating = async (atraccionId, newRating) => {
+    try {
+      const atraccionRef = doc(db, 'Atracciones', atraccionId);
+      await updateDoc(atraccionRef, {
+        valoracion: newRating, // Actualiza la valoración con la nueva calificación
+      });
+    } catch (error) {
+      console.error("Error al actualizar la valoración:", error);
+    }
+  };
+
+  const renderServicios = (servicios) => {
+    return servicios.map((servicio, index) => (
+      <Text key={index} style={styles.servicio}>
+        • {servicio}
+      </Text>
+    ));
+  };
+
+  const renderImagenes = (imagenes) => (
+    <FlatList
+      data={imagenes}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <Image
+          source={{ uri: item }}
+          style={styles.image}
+          onError={(e) => console.log('Error al cargar imagen:', e.nativeEvent.error, 'URL:', item)}
+        />
+      )}
+    />
+  );
+
+  const renderAtraccion = ({ item }) => (
+    <View style={styles.atraccionContainer}>
+      <Text style={styles.title}>{item.nombre}</Text>
+      <Text style={styles.description}>{item.descripcion}</Text>
+
+      <View style={styles.imageContainer}>
+        {item.imagenes && Array.isArray(item.imagenes) ? renderImagenes(item.imagenes) : <Text>No hay imágenes disponibles</Text>}
+      </View>
+
+      <Text style={styles.sectionTitle}>Servicios Ofrecidos</Text>
+      {renderServicios(item.servicios)}
+
+      <Text style={styles.sectionTitle}>Ubicación</Text>
+      <Text style={styles.link} onPress={() => Linking.openURL(item.ubicacion.googleMapsUrl)}>
+        Ver en Google Maps
+      </Text>
+
+      <Text style={styles.sectionTitle}>Valoración</Text>
+      <Rating
+        startingValue={item.valoracion || 4}
+        imageSize={30}
+        onFinishRating={(rating) => handleRating(item.id, rating)} // Actualiza la valoración cuando el usuario califique
+        style={styles.rating}
       />
     </View>
   );
-}
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0067C6" style={{ flex: 1, justifyContent: 'center' }} />;
+  }
+
+  return (
+    <View style={styles.container}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Buscar atracción..."
+        value={searchQuery}
+        onChangeText={(text) => setSearchQuery(text)}
+      />
+      {filteredAtracciones.length > 0 ? (
+        <FlatList
+          data={filteredAtracciones}
+          renderItem={renderAtraccion}
+          keyExtractor={(item) => item.id}
+        />
+      ) : (
+        <Text style={styles.noResults}>No se encontraron atracciones</Text>
+      )}
+    </View>
+  );
+};
+
+export default Atracciones;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0067C6',
+    backgroundColor: '#fff',
     padding: 10,
   },
-  headerText: {
-    fontSize: 28,
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 20,
-  },
   atraccionContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
+    marginBottom: 40,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#0067C6',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  description: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  imageContainer: {
     marginBottom: 20,
   },
-  imagen: {
-    width: '100%',
+  image: {
+    width: 300,
     height: 200,
+    marginRight: 10,
     borderRadius: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#0067C6',
+    marginTop: 20,
     marginBottom: 10,
   },
-  nombre: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  descripcion: {
+  servicio: {
     fontSize: 16,
-    color: '#666',
+    color: '#333',
+    marginBottom: 5,
+  },
+  link: {
+    color: '#0067C6',
+    textDecorationLine: 'underline',
+    marginBottom: 20,
+  },
+  rating: {
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  noResults: {
+    fontSize: 18,
+    color: '#333',
+    textAlign: 'center',
   },
 });

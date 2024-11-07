@@ -1,63 +1,51 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ScrollView, TextInput } from 'react-native';
-import { Linking } from 'react-native';
-
-// Datos de los restaurantes
-const restauranteData1 = {
-  nombre: 'El Cheff En su Hogar',
-  descripcion: 'Comida tradicional nicaragüense en el centro de Juigalpa.',
-  servicios: ['Wi-Fi', 'Comida para llevar', 'Mesas al aire libre'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0854,-85.2072',
-  },
-  imagenes: [
-    require('../IMAGENES/Cheff En su Hogar 1.jpeg'),
-    require('../IMAGENES/Cheff En su Hogar 2.jpeg'),
-    require('../IMAGENES/Cheff En su Hogar 3.jpeg'),
-    require('../IMAGENES/Cheff En su Hogar 4.jpeg'),
-  ],
-};
-
-const restauranteData2 = {
-  nombre: 'Asados Bernie´s',
-  descripcion: 'Especialidad en asados y deliciosos platos típicos.',
-  servicios: ['Wi-Fi', 'Estacionamiento', 'Bar'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0865,-85.2083',
-  },
-  imagenes: [
-    require('../IMAGENES/Asados Bernie 1.jpeg'),
-    require('../IMAGENES/Asados Bernie 2.jpeg'),
-    require('../IMAGENES/Asados Bernie 3.jpeg'),
-    require('../IMAGENES/Asados Bernie 4.jpeg'),
-  ],
-};
-
-// Nuevo restaurante: Restaurante La Casona
-const restauranteData3 = {
-  nombre: 'Restaurante Los caracoles Negros',
-  descripcion: 'Restaurante familiar con ambiente acogedor y platillos variados.',
-  servicios: ['Wi-Fi', 'Área para eventos', 'Estacionamiento privado'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0897,-85.2101',
-  },
-  imagenes: [
-    require('../IMAGENES/Los caracoles Negros 1.jpeg'),
-    require('../IMAGENES/Los caracoles Negros 2.jpeg'),
-    require('../IMAGENES/Los caracoles Negros 3.jpeg'),
-    require('../IMAGENES/Los caracoles Negros 4.jpeg'),
-  ],
-};
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TextInput, Linking, ActivityIndicator } from 'react-native';
+import { Rating } from 'react-native-ratings';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { db } from '../database/firebaseconfig';
 
 const Restaurantes = () => {
+  const [restaurantes, setRestaurantes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const restaurantes = [restauranteData1, restauranteData2, restauranteData3];
+  // Función para obtener los restaurantes desde Firebase
+  const fetchRestaurantes = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'Restaurantes'));
+      const restaurantesData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRestaurantes(restaurantesData);
+    } catch (error) {
+      console.error("Error al obtener restaurantes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRestaurantes();
+  }, []);
 
   // Filtrar los restaurantes según la búsqueda
   const filteredRestaurantes = restaurantes.filter((restaurante) =>
     restaurante.nombre.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Función para actualizar la valoración en Firebase
+  const handleRating = async (restauranteId, newRating) => {
+    try {
+      const restauranteRef = doc(db, 'Restaurantes', restauranteId);
+      await updateDoc(restauranteRef, {
+        valoracion: newRating, // Actualiza la valoración con la nueva calificación
+      });
+    } catch (error) {
+      console.error("Error al actualizar la valoración:", error);
+    }
+  };
 
   const renderServicios = (servicios) => {
     return servicios.map((servicio, index) => (
@@ -67,40 +55,55 @@ const Restaurantes = () => {
     ));
   };
 
-  const renderImagenes = (imagenes) => {
-    return (
-      <FlatList
-        data={imagenes}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Image source={item} style={styles.image} />}
-      />
-    );
-  };
+  const renderImagenes = (imagenes) => (
+    <FlatList
+      data={imagenes}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <Image
+          source={{ uri: item }}
+          style={styles.image}
+          onError={(e) => console.log('Error al cargar imagen:', e.nativeEvent.error, 'URL:', item)}
+        />
+      )}
+    />
+  );
 
-  const renderRestaurante = (data) => (
+  const renderRestaurante = ({ item }) => (
     <View style={styles.restauranteContainer}>
-      <Text style={styles.title}>{data.nombre}</Text>
-      <Text style={styles.description}>{data.descripcion}</Text>
+      <Text style={styles.title}>{item.nombre}</Text>
+      <Text style={styles.description}>{item.descripcion}</Text>
 
-      <View style={styles.imageContainer}>{renderImagenes(data.imagenes)}</View>
+      <View style={styles.imageContainer}>
+        {item.imagenes && Array.isArray(item.imagenes) ? renderImagenes(item.imagenes) : <Text>No hay imágenes disponibles</Text>}
+      </View>
 
       <Text style={styles.sectionTitle}>Servicios Ofrecidos</Text>
-      {renderServicios(data.servicios)}
+      {renderServicios(item.servicios)}
 
       <Text style={styles.sectionTitle}>Ubicación</Text>
-      <Text
-        style={styles.link}
-        onPress={() => Linking.openURL(data.ubicacion.googleMapsUrl)}
-      >
+      <Text style={styles.link} onPress={() => Linking.openURL(item.ubicacion.googleMapsUrl)}>
         Ver en Google Maps
       </Text>
+
+      <Text style={styles.sectionTitle}>Valoración</Text>
+      <Rating
+        startingValue={item.valoracion || 4}
+        imageSize={30}
+        onFinishRating={(rating) => handleRating(item.id, rating)} // Actualiza la valoración cuando el usuario califique
+        style={styles.rating}
+      />
     </View>
   );
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0067C6" style={{ flex: 1, justifyContent: 'center' }} />;
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <TextInput
         style={styles.searchInput}
         placeholder="Buscar restaurante..."
@@ -108,11 +111,15 @@ const Restaurantes = () => {
         onChangeText={(text) => setSearchQuery(text)}
       />
       {filteredRestaurantes.length > 0 ? (
-        filteredRestaurantes.map((restaurante) => renderRestaurante(restaurante))
+        <FlatList
+          data={filteredRestaurantes}
+          renderItem={renderRestaurante}
+          keyExtractor={(item) => item.id}
+        />
       ) : (
         <Text style={styles.noResults}>No se encontraron restaurantes</Text>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -165,6 +172,10 @@ const styles = StyleSheet.create({
     color: '#0067C6',
     textDecorationLine: 'underline',
     marginBottom: 20,
+  },
+  rating: {
+    alignSelf: 'center',
+    marginTop: 10,
   },
   searchInput: {
     height: 40,

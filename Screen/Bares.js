@@ -1,68 +1,52 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ScrollView, TextInput } from 'react-native';
-import { Linking } from 'react-native';
-
-// Datos de los bares
-const barData1 = {
-  nombre: 'The View Managua',
-  descripcion: 'Bar con ambiente festivo y cócteles exóticos en el centro de Juigalpa.',
-  servicios: ['Wi-Fi', 'Terraza al aire libre', 'Música en vivo'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0900,-85.2100',
-  },
-  imagenes: [
-    require('../IMAGENES/The View 1.jpeg'),
-    require('../IMAGENES/The View 2.jpeg'),
-    require('../IMAGENES/The View 3.jpeg'),
-    require('../IMAGENES/The View 4.jpeg'),
-    require('../IMAGENES/The View 5.jpeg'),
-    require('../IMAGENES/The View 6.jpeg'),
-  ],
-};
-
-const barData2 = {
-  nombre: 'Amazonia RestoBar',
-  descripcion: 'Café y bar con una amplia selección de cervezas y bebidas.',
-  servicios: ['Wi-Fi', 'Estacionamiento', 'Terraza'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0890,-85.2090',
-  },
-  imagenes: [
-    require('../IMAGENES/RestoBar 1.jpeg'),
-    require('../IMAGENES/RestoBar 2.jpeg'),
-    require('../IMAGENES/RestoBar 3.jpeg'),
-    require('../IMAGENES/RestoBar 4.jpeg'),
-  ],
-};
-
-// Nuevo bar: Bar El Oasis
-const barData3 = {
-  nombre: 'La liga',
-  descripcion: 'Bar con un ambiente relajante y buena música.',
-  servicios: ['Wi-Fi', 'Área para eventos', 'Comida'],
-  ubicacion: {
-    googleMapsUrl: 'https://maps.google.com/?q=12.0910,-85.2110',
-  },
-  imagenes: [
-    require('../IMAGENES/La liga 1.jpeg'),
-    require('../IMAGENES/La liga 2.jpeg'),
-    require('../IMAGENES/La liga 3.jpeg'),
-    require('../IMAGENES/La liga 4.jpeg'),
-    require('../IMAGENES/La liga 5.jpeg'),
-    require('../IMAGENES/La liga 6.jpeg'),
-    require('../IMAGENES/La liga 7.jpeg'),
-  ],
-};
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TextInput, Linking, ActivityIndicator } from 'react-native';
+import { Rating } from 'react-native-ratings';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { db } from '../database/firebaseconfig';
 
 const Bares = () => {
+  const [bares, setBares] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const bares = [barData1, barData2, barData3];
+  // Función para obtener bares desde Firebase
+  const fetchBares = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'Bares'));
+      const baresData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setBares(baresData);
+    } catch (error) {
+      console.error('Error al obtener bares:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBares();
+  }, []);
 
   // Filtrar los bares según la búsqueda
   const filteredBares = bares.filter((bar) =>
     bar.nombre.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Función para actualizar la valoración en Firebase
+  const handleRating = async (barId, newRating) => {
+    try {
+      const barRef = doc(db, 'Bares', barId);
+      await updateDoc(barRef, {
+        valoracion: newRating, // Actualiza la valoración con la nueva calificación
+      });
+    } catch (error) {
+      console.error('Error al actualizar la valoración:', error);
+    }
+  };
 
   const renderServicios = (servicios) => {
     return servicios.map((servicio, index) => (
@@ -72,40 +56,55 @@ const Bares = () => {
     ));
   };
 
-  const renderImagenes = (imagenes) => {
-    return (
-      <FlatList
-        data={imagenes}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Image source={item} style={styles.image} />}
-      />
-    );
-  };
+  const renderImagenes = (imagenes) => (
+    <FlatList
+      data={imagenes}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <Image
+          source={{ uri: item }}
+          style={styles.image}
+          onError={(e) => console.log('Error al cargar imagen:', e.nativeEvent.error, 'URL:', item)}
+        />
+      )}
+    />
+  );
 
-  const renderBar = (data) => (
+  const renderBar = ({ item }) => (
     <View style={styles.barContainer}>
-      <Text style={styles.title}>{data.nombre}</Text>
-      <Text style={styles.description}>{data.descripcion}</Text>
+      <Text style={styles.title}>{item.nombre}</Text>
+      <Text style={styles.description}>{item.descripcion}</Text>
 
-      <View style={styles.imageContainer}>{renderImagenes(data.imagenes)}</View>
+      <View style={styles.imageContainer}>
+        {item.imagenes && Array.isArray(item.imagenes) ? renderImagenes(item.imagenes) : <Text>No hay imágenes disponibles</Text>}
+      </View>
 
       <Text style={styles.sectionTitle}>Servicios Ofrecidos</Text>
-      {renderServicios(data.servicios)}
+      {renderServicios(item.servicios)}
 
       <Text style={styles.sectionTitle}>Ubicación</Text>
-      <Text
-        style={styles.link}
-        onPress={() => Linking.openURL(data.ubicacion.googleMapsUrl)}
-      >
+      <Text style={styles.link} onPress={() => Linking.openURL(item.ubicacion.googleMapsUrl)}>
         Ver en Google Maps
       </Text>
+
+      <Text style={styles.sectionTitle}>Valoración</Text>
+      <Rating
+        startingValue={item.valoracion || 4}
+        imageSize={30}
+        onFinishRating={(rating) => handleRating(item.id, rating)} // Actualiza la valoración cuando el usuario califique
+        style={styles.rating}
+      />
     </View>
   );
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0067C6" style={{ flex: 1, justifyContent: 'center' }} />;
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <TextInput
         style={styles.searchInput}
         placeholder="Buscar bar..."
@@ -113,11 +112,15 @@ const Bares = () => {
         onChangeText={(text) => setSearchQuery(text)}
       />
       {filteredBares.length > 0 ? (
-        filteredBares.map((bar) => renderBar(bar))
+        <FlatList
+          data={filteredBares}
+          renderItem={renderBar}
+          keyExtractor={(item) => item.id}
+        />
       ) : (
         <Text style={styles.noResults}>No se encontraron bares</Text>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -170,6 +173,10 @@ const styles = StyleSheet.create({
     color: '#0067C6',
     textDecorationLine: 'underline',
     marginBottom: 20,
+  },
+  rating: {
+    alignSelf: 'center',
+    marginTop: 10,
   },
   searchInput: {
     height: 40,
