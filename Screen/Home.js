@@ -8,36 +8,36 @@ const categories = [
     { id: '3', title: 'Atracciones', image: require('../IMAGENES/Atracciones.jpg'), screen: 'AtraccionesScreen' },
     { id: '4', title: 'Restaurantes', image: require('../IMAGENES/Restaurantes.jpg'), screen: 'RestaurantesScreen' },
     { id: '5', title: 'Bares', image: require('../IMAGENES/Bares.jpg'), screen: 'BaresScreen' },
-    { id: '6', title: 'Guías Turistos', image: require('../IMAGENES/Guía de Turista.jpg'), screen: 'GuiasTurismoScreen' },
-    ];
+    { id: '6', title: 'Guías Turisticos', image: require('../IMAGENES/Guía de Turista.jpg'), screen: 'GuiasTurismoScreen' },
+];
 
-    const Home = () => {
+const Home = () => {
     const navigation = useNavigation();
 
     const renderItem = ({ item }) => (
         <TouchableOpacity
-        style={styles.card}
-        onPress={() => navigation.navigate(item.screen)}>
-        <Image source={item.image} style={styles.cardImage} />
-        <Text style={styles.cardTitle}>{item.title}</Text>
+            style={styles.card}
+            onPress={() => navigation.navigate(item.screen)}>
+            <Image source={item.image} style={styles.cardImage} />
+            <Text style={styles.cardTitle}>{item.title}</Text>
         </TouchableOpacity>
     );
 
     return (
         <View style={styles.container}>
-        <FlatList
-            data={categories}
-            keyExtractor={item => item.id}
-            renderItem={renderItem}
-            numColumns={2}
-        />
+            <FlatList
+                data={categories}
+                keyExtractor={item => item.id}
+                renderItem={renderItem}
+                numColumns={2}
+            />
         </View>
     );
-    };
+};
 
-    export default Home;
+export default Home;
 
-    const styles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
@@ -53,8 +53,8 @@ const categories = [
         justifyContent: 'center',
     },
     cardImage: {
-        width: 50,
-        height: 50,
+        width: 120, // Aumenta el tamaño de la imagen
+        height: 120, // Aumenta el tamaño de la imagen
         resizeMode: 'contain',
         marginBottom: 10,
     },
