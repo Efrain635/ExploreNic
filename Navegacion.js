@@ -8,7 +8,6 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import firebaseconfig from './database/firebaseconfig';
 
 // Iconos
 import Settings from './Screen/Settings'; // Pantalla de Configuración
@@ -177,7 +176,7 @@ function StackDetailHome() {
         component={Bares}>
       </DetailHomeNavigator.Screen>
 
-      {/* Añadiendo la pantalla Bares */}
+      {/* Añadiendo la pantalla turismo */}
         <DetailHomeNavigator.Screen
         name="GuiasTurismoScreen"
         component={GuiasTurismo}>

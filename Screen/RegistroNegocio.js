@@ -20,6 +20,13 @@ export default function RegistroNegocio() {
   const [cargando, setCargando] = useState(false);
 
   const handleRegistro = async () => {
+
+  // Validación de campos
+  if (!nombre || !descripcion || serviciosSeleccionados.some(servicio => servicio === '') || imagenes.length === 0) {
+    Alert.alert('Error', 'Por favor, complete todos los campos antes de registrar el negocio');
+    return;
+  }
+
     try {
       setCargando(true);
   
@@ -41,7 +48,7 @@ export default function RegistroNegocio() {
       setDescripcion('');
       setUbicacion({ latitude: 12.8654, longitude: -85.2072 });
       setMarkerVisible(false);
-      setServiciosSeleccionados(['', '', '', '', '']);
+      setServiciosSeleccionados(['', '']);
       setImagenes([]);
     } catch (error) {
       Alert.alert('Error', 'No se pudo registrar el negocio');
