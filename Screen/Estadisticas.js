@@ -1,40 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { BarChart } from 'react-native-chart-kit'; // Asegúrate de que esta librería esté instalada
-import { collection, getDocs, query } from 'firebase/firestore';
-import { db } from '../database/firebaseconfig';  // Conexión Firebase
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Dimensions } from 'react-native';
+import { BarChart } from 'react-native-chart-kit';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../database/firebaseconfig';
 
 export default function Estadisticas() {
-  const [loading, setLoading] = useState(true); // Indicador de carga
+  const [loading, setLoading] = useState(true);
   const [dataNegocios, setDataNegocios] = useState({
-    labels: [''],
-    datasets: [{ data: [0] }]
-  });
-  const [dataFrecuencia, setDataFrecuencia] = useState({
-    labels: [''],
-    datasets: [{ data: [0] }]
+    labels: [],
+    datasets: [{ data: [] }]
   });
 
-  // Cargar datos para gráfico de tipos de negocios
+  const colecciones = [
+    "Alojamiento", 
+    "Alquiler de coche", 
+    "Atracciones", 
+    "Restaurantes", 
+    "Bares", 
+    "Guías turísticos"
+  ];
+
   useEffect(() => {
     const cargarDatosNegocios = async () => {
       try {
-        const q = query(collection(db, "negocios")); // Suponiendo que tienes una colección de negocios
-        const querySnapshot = await getDocs(q);
         const tipos = [];
         const cantidad = [];
 
-        querySnapshot.forEach((doc) => {
-          const datos = doc.data();
-          const { tipo } = datos;
-          if (!tipos.includes(tipo)) {
-            tipos.push(tipo);
-            cantidad.push(1);
-          } else {
-            const index = tipos.indexOf(tipo);
-            cantidad[index] += 1;
-          }
-        });
+        for (const coleccion of colecciones) {
+          const q = collection(db, coleccion);
+          const querySnapshot = await getDocs(q);
+
+          tipos.push(coleccion);
+          cantidad.push(querySnapshot.size);
+        }
 
         setDataNegocios({
           labels: tipos,
@@ -48,49 +46,11 @@ export default function Estadisticas() {
     cargarDatosNegocios();
   }, []);
 
-  // Cargar datos para el gráfico de frecuencia de registros de usuario
   useEffect(() => {
-    const cargarDatosFrecuencia = async () => {
-      try {
-        const q = query(collection(db, "usuarios")); // Suponiendo que tienes una colección de usuarios
-        const querySnapshot = await getDocs(q);
-        const fechas = [];
-        const cantidad = [];
-
-        querySnapshot.forEach((doc) => {
-          const { fechaRegistro } = doc.data();
-          const fecha = new Date(fechaRegistro.toDate());
-          const mes = fecha.getMonth() + 1;
-          const anio = fecha.getFullYear();
-          const clave = `${anio}-${mes}`;
-
-          if (!fechas.includes(clave)) {
-            fechas.push(clave);
-            cantidad.push(1);
-          } else {
-            const index = fechas.indexOf(clave);
-            cantidad[index] += 1;
-          }
-        });
-
-        setDataFrecuencia({
-          labels: fechas,
-          datasets: [{ data: cantidad }]
-        });
-      } catch (error) {
-        console.error("Error al obtener los datos de registros: ", error);
-      }
-    };
-
-    cargarDatosFrecuencia();
-  }, []);
-
-  // Cuando los datos estén listos, se quita el indicador de carga
-  useEffect(() => {
-    if (dataNegocios && dataFrecuencia) {
+    if (dataNegocios.labels.length > 0) {
       setLoading(false);
     }
-  }, [dataNegocios, dataFrecuencia]);
+  }, [dataNegocios]);
 
   if (loading) {
     return (
@@ -101,30 +61,23 @@ export default function Estadisticas() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Título de la pantalla */}
-      <Text style={styles.title}>Estadísticas de Negocios y Registros</Text>
-
-      {/* Gráfico de Tipos de Negocios */}
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={styles.contentContainer}
+    >
+      <Text style={styles.title}>Estadísticas de Negocios</Text>
       <Text style={styles.subtitle}>Tipos de Negocios Registrados</Text>
       <BarChart
         data={dataNegocios}
-        width={300}
-        height={220}
-        yAxisLabel="Cantidad"
+        width={Dimensions.get('window').width - 20}
+        height={300}
+        yAxisLabel=" "
+        yAxisSuffix=" negocios"
+        fromZero={true}
         chartConfig={chartConfig}
+        showBarTops={false}
         style={styles.chart}
-      />
-
-      {/* Gráfico de Frecuencia de Registros de Usuario */}
-      <Text style={styles.subtitle}>Frecuencia de Registros de Usuario</Text>
-      <BarChart
-        data={dataFrecuencia}
-        width={300}
-        height={220}
-        yAxisLabel="Cantidad"
-        chartConfig={chartConfig}
-        style={styles.chart}
+        verticalLabelRotation={30}  // Rotar las etiquetas para mejorar la legibilidad
       />
     </ScrollView>
   );
@@ -132,19 +85,26 @@ export default function Estadisticas() {
 
 const chartConfig = {
   backgroundColor: "#0067C6",
-  backgroundGradientFrom: "#0067C6",
+  backgroundGradientFrom: "#004c91",
   backgroundGradientTo: "#0067C6",
-  decimalPlaces: 0, // No mostrar decimales
+  decimalPlaces: 0,
   color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-  style: {
-    borderRadius: 16
+  barPercentage: 0.5,
+  propsForBackgroundLines: {
+    strokeWidth: 1,
+    stroke: "#dfe6e9",
+    strokeDasharray: "4",
   },
-  propsForDots: {
-    r: "6",
-    strokeWidth: "2",
-    stroke: "#ffa726"
-  }
+  style: {
+    borderRadius: 16,
+    padding: 10,
+  },
+  propsForLabels: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    fill: '#fff'
+  },
 };
 
 const styles = StyleSheet.create({
@@ -152,6 +112,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 10,
+  },
+  contentContainer: {
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingTop: 20,
   },
   loadingContainer: {
     flex: 1,
