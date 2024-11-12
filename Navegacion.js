@@ -8,7 +8,6 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import firebaseconfig from './database/firebaseconfig';
 
 // Iconos
 import Settings from './Screen/Settings'; // Pantalla de Configuración
@@ -26,6 +25,7 @@ import Atracciones from './Screen/Atracciones';  // Pantalla de Servicios de Atr
 import Restaurantes from './Screen/Restaurantes';  // Pantalla de Servicios de Restaurantes
 import Bares from './Screen/Bares';  // Pantalla de Servicios de Bares
 import GuiasTurismo from './Screen/GuiasTurismo' //Pantalla de Servicio Turista
+import VerNegocios from './Screen/VerNegocios'
 
 // Principal
 import Login from './Screen/Login'; // Inicio de Sesión
@@ -181,6 +181,12 @@ function StackDetailHome() {
         <DetailHomeNavigator.Screen
         name="GuiasTurismoScreen"
         component={GuiasTurismo}>
+      </DetailHomeNavigator.Screen>
+      
+      {/* Añadiendo la pantalla turismo */}
+      <DetailHomeNavigator.Screen
+        name="VerNegociosScreen"
+        component={VerNegocios}>
       </DetailHomeNavigator.Screen>
 
     </DetailHomeNavigator.Navigator>
