@@ -1,56 +1,100 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Dimensions } from 'react-native';
-import { BarChart } from 'react-native-chart-kit';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Dimensions, Button, Alert } from 'react-native';
+import { PieChart } from 'react-native-chart-kit';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../database/firebaseconfig';
+import { jsPDF } from 'jspdf';
+import * as FileSystem from 'expo-file-system'; // Manejo de archivos
+import * as Sharing from 'expo-sharing'; // Para compartir archivos
+import { captureRef } from 'react-native-view-shot'; // Captura de imagen
 
 export default function Estadisticas() {
   const [loading, setLoading] = useState(true);
-  const [dataNegocios, setDataNegocios] = useState({
-    labels: [],
-    datasets: [{ data: [] }]
-  });
+  const [dataNegocios, setDataNegocios] = useState([]);
+  const chartRef = useRef();
 
   const colecciones = [
     "Alojamiento", 
-    "Alquiler de coche", 
+    "Alquiler de coches", 
     "Atracciones", 
     "Restaurantes", 
     "Bares", 
     "Guías turísticos"
   ];
 
+  // Función para generar un color hexadecimal válido de 6 dígitos
+  const generarColor = () => {
+    return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+  };
+
   useEffect(() => {
     const cargarDatosNegocios = async () => {
       try {
-        const tipos = [];
-        const cantidad = [];
+        const data = [];
 
         for (const coleccion of colecciones) {
           const q = collection(db, coleccion);
           const querySnapshot = await getDocs(q);
-
-          tipos.push(coleccion);
-          cantidad.push(querySnapshot.size);
+          data.push({
+            name: coleccion,
+            population: querySnapshot.size,
+            color: generarColor(),
+            legendFontColor: "#7F7F7F",
+            legendFontSize: 13
+          });
         }
 
-        setDataNegocios({
-          labels: tipos,
-          datasets: [{ data: cantidad }]
-        });
+        setDataNegocios(data);
       } catch (error) {
         console.error("Error al obtener los datos de negocios: ", error);
       }
+      setLoading(false);
     };
 
     cargarDatosNegocios();
   }, []);
 
-  useEffect(() => {
-    if (dataNegocios.labels.length > 0) {
-      setLoading(false);
+  // Función para generar y compartir el PDF
+  const generarPDF = async () => {
+    try {
+      // Capturar el gráfico como imagen
+      const uri = await captureRef(chartRef, {
+        format: "png",
+        quality: 1,
+      });
+
+      // Crear una instancia de jsPDF
+      const doc = new jsPDF();
+      doc.text("Estadísticas de Negocios", 10, 10);
+
+      // Leer la imagen capturada y agregarla al PDF
+      const chartImage = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      doc.addImage(`data:image/png;base64,${chartImage}`, "PNG", 10, 20, 180, 100);
+
+      // Agregar datos de texto al PDF
+      dataNegocios.forEach((item, index) => {
+        doc.text(`${item.name}: ${item.population} negocios`, 10, 140 + index * 10);
+      });
+
+      // Generar el PDF como base64
+      const pdfBase64 = doc.output('datauristring').split(',')[1];
+      const fileUri = `${FileSystem.documentDirectory}reporte_negocios.pdf`;
+
+      // Guardar el archivo PDF
+      await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Compartir el archivo PDF
+      await Sharing.shareAsync(fileUri);
+
+    } catch (error) {
+      console.error("Error al generar o compartir el PDF: ", error);
+      Alert.alert('Error', 'No se pudo generar o compartir el PDF.');
     }
-  }, [dataNegocios]);
+  };
 
   if (loading) {
     return (
@@ -61,24 +105,35 @@ export default function Estadisticas() {
   }
 
   return (
-    <ScrollView 
-      style={styles.container} 
-      contentContainerStyle={styles.contentContainer}
-    >
-      <Text style={styles.title}>Estadísticas de Negocios</Text>
-      <Text style={styles.subtitle}>Tipos de Negocios Registrados</Text>
-      <BarChart
-        data={dataNegocios}
-        width={Dimensions.get('window').width - 20}
-        height={300}
-        yAxisLabel=" "
-        yAxisSuffix=" negocios"
-        fromZero={true}
-        chartConfig={chartConfig}
-        showBarTops={false}
-        style={styles.chart}
-        verticalLabelRotation={30}  // Rotar las etiquetas para mejorar la legibilidad
-      />
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <Text style={styles.title}>Estadísticas de Registros</Text>
+      <Text style={styles.subtitle}>Cantidad de Negocios por Tipo</Text>
+      <View ref={chartRef} collapsable={false}>
+        <PieChart
+          data={dataNegocios}
+          width={Dimensions.get('window').width - 50} // Reducir el ancho del gráfico
+          height={200} // Reducir la altura del gráfico
+          chartConfig={chartConfig}
+          accessor="population" // Muestra cantidad en lugar de porcentaje
+          backgroundColor="transparent"
+          paddingLeft="20"
+          hasLegend={false} // Desactivar la leyenda dentro del gráfico
+          style={styles.chart}
+        />
+      </View>
+      <View style={styles.legendContainer}>
+        {dataNegocios.map((item, index) => (
+          <View key={index} style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: item.color }]} />
+            <Text style={styles.legendText}>
+              {item.name}: {item.population} negocios
+            </Text>
+          </View>
+        ))}
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Generar y Compartir PDF" onPress={generarPDF} />
+      </View>
     </ScrollView>
   );
 }
@@ -90,20 +145,8 @@ const chartConfig = {
   decimalPlaces: 0,
   color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-  barPercentage: 0.5,
-  propsForBackgroundLines: {
-    strokeWidth: 1,
-    stroke: "#dfe6e9",
-    strokeDasharray: "4",
-  },
   style: {
     borderRadius: 16,
-    padding: 10,
-  },
-  propsForLabels: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    fill: '#fff'
   },
 };
 
@@ -139,5 +182,29 @@ const styles = StyleSheet.create({
   chart: {
     marginVertical: 20,
     borderRadius: 16,
-  }
+  },
+  legendContainer: {
+    marginTop: 20,
+    alignItems: 'flex-start',
+    paddingLeft: 20,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  legendColor: {
+    width: 15,
+    height: 15,
+    marginRight: 8,
+  },
+  legendText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  buttonContainer: {
+    marginTop: 20,
+    width: '100%',
+    paddingHorizontal: 10,
+  },
 });
