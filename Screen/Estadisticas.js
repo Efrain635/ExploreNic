@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Dimensions, Button, Alert } from 'react-native';
-import { PieChart } from 'react-native-chart-kit';
+import { PieChart, BarChart } from 'react-native-chart-kit';  // Importar gráfico de barras
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../database/firebaseconfig';
 import { jsPDF } from 'jspdf';
@@ -11,7 +11,9 @@ import { captureRef } from 'react-native-view-shot'; // Captura de imagen
 export default function Estadisticas() {
   const [loading, setLoading] = useState(true);
   const [dataNegocios, setDataNegocios] = useState([]);
-  const chartRef = useRef();
+  const [barChartData, setBarChartData] = useState([]);  // Datos para el gráfico de barras
+  const pieChartRef = useRef();
+  const barChartRef = useRef();  // Referencia para el gráfico de barras
 
   const colecciones = [
     "Alojamiento", 
@@ -22,29 +24,50 @@ export default function Estadisticas() {
     "Guías turísticos"
   ];
 
-  // Función para generar un color hexadecimal válido de 6 dígitos
-  const generarColor = () => {
-    return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
-  };
+  // Colores predefinidos para las barras y el gráfico de pastel
+  const coloresPastel = [
+    "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#33FFD4", "#FF9133"
+  ];
+
+  const coloresBarras = [
+    "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#33FFD4", "#FF9133"
+  ];
 
   useEffect(() => {
     const cargarDatosNegocios = async () => {
       try {
         const data = [];
+        const barChartDataPoints = [];
 
-        for (const coleccion of colecciones) {
+        for (let i = 0; i < colecciones.length; i++) {
+          const coleccion = colecciones[i];
           const q = collection(db, coleccion);
           const querySnapshot = await getDocs(q);
           data.push({
             name: coleccion,
             population: querySnapshot.size,
-            color: generarColor(),
+            color: coloresPastel[i],  // Asignar color específico para cada tipo de negocio
             legendFontColor: "#7F7F7F",
             legendFontSize: 13
           });
+
+          // Para el gráfico de barras, se agregan los valores de la población de cada colección
+          barChartDataPoints.push(querySnapshot.size);
         }
 
         setDataNegocios(data);
+
+        setBarChartData({
+          labels: colecciones, // Etiquetas de las colecciones
+          datasets: [
+            {
+              data: barChartDataPoints,  // Datos de la población por tipo de negocio
+              color: (opacity = 1) => coloresBarras, // Usamos la lista de colores para las barras
+              strokeWidth: 2,
+            }
+          ]
+        });
+
       } catch (error) {
         console.error("Error al obtener los datos de negocios: ", error);
       }
@@ -55,32 +78,32 @@ export default function Estadisticas() {
   }, []);
 
   // Función para generar y compartir el PDF
-  const generarPDF = async () => {
+  const generarPDF = async (chartRef, type) => {
     try {
       // Capturar el gráfico como imagen
-      const uri = await captureRef(chartRef, {
+      const chartUri = await captureRef(chartRef, {
         format: "png",
         quality: 1,
       });
 
       // Crear una instancia de jsPDF
       const doc = new jsPDF();
-      doc.text("Estadísticas de Negocios", 10, 10);
+      doc.text(`Estadísticas de Negocios - Gráfico de ${type}`, 10, 10);
 
       // Leer la imagen capturada y agregarla al PDF
-      const chartImage = await FileSystem.readAsStringAsync(uri, {
+      const chartImage = await FileSystem.readAsStringAsync(chartUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
-      doc.addImage(`data:image/png;base64,${chartImage}`, "PNG", 10, 20, 180, 100);
+      doc.addImage(`data:image/png;base64,${chartImage}`, "PNG", 10, 20, 180, 140);
 
       // Agregar datos de texto al PDF
       dataNegocios.forEach((item, index) => {
-        doc.text(`${item.name}: ${item.population} negocios`, 10, 140 + index * 10);
+        doc.text(`${item.name}: ${item.population} negocios`, 10, 170 + index * 10);
       });
 
       // Generar el PDF como base64
       const pdfBase64 = doc.output('datauristring').split(',')[1];
-      const fileUri = `${FileSystem.documentDirectory}reporte_negocios.pdf`;
+      const fileUri = `${FileSystem.documentDirectory}reporte_${type}.pdf`;
 
       // Guardar el archivo PDF
       await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
@@ -107,33 +130,77 @@ export default function Estadisticas() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.title}>Estadísticas de Registros</Text>
-      <Text style={styles.subtitle}>Cantidad de Negocios por Tipo</Text>
-      <View ref={chartRef} collapsable={false}>
-        <PieChart
-          data={dataNegocios}
-          width={Dimensions.get('window').width - 50} // Reducir el ancho del gráfico
-          height={200} // Reducir la altura del gráfico
-          chartConfig={chartConfig}
-          accessor="population" // Muestra cantidad en lugar de porcentaje
-          backgroundColor="transparent"
-          paddingLeft="20"
-          hasLegend={false} // Desactivar la leyenda dentro del gráfico
-          style={styles.chart}
-        />
+
+      {/* Tarjeta para el gráfico de pastel */}
+      <View style={styles.card}>
+        <Text style={styles.subtitle}>Cantidad de Negocios por Tipo</Text>
+        <View ref={pieChartRef} collapsable={false}>
+          <PieChart
+            data={dataNegocios}
+            width={Dimensions.get('window').width - 50}
+            height={200}
+            chartConfig={chartConfig}
+            accessor="population"
+            backgroundColor="transparent"
+            paddingLeft="20"
+            hasLegend={false}
+            style={styles.chart}
+          />
+        </View>
+
+        {/* Leyenda */}
+        <View style={styles.legendContainer}>
+          {dataNegocios.map((item, index) => (
+            <View key={index} style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: item.color }]} />
+              <Text style={styles.legendText}>
+                {item.name}: {item.population} negocios
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Botón para generar y compartir el PDF del gráfico de pastel */}
+        <View style={styles.buttonContainer}>
+          <Button title="Generar y Compartir PDF (Pastel)" onPress={() => generarPDF(pieChartRef, 'Pastel')} />
+        </View>
       </View>
-      <View style={styles.legendContainer}>
-        {dataNegocios.map((item, index) => (
-          <View key={index} style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-            <Text style={styles.legendText}>
-              {item.name}: {item.population} negocios
-            </Text>
-          </View>
-        ))}
+
+      {/* Tarjeta para el gráfico de barras */}
+      <View style={styles.card}>
+        <Text style={styles.subtitle}>Comparación de Negocios por Tipo</Text>
+        <View ref={barChartRef} collapsable={false}>
+          <BarChart
+            data={barChartData}
+            width={Dimensions.get('window').width - 70}
+            height={220}
+            chartConfig={{
+              backgroundColor: '#ffffff',
+              backgroundGradientFrom: '#ffffff',
+              backgroundGradientTo: '#ffffff',
+              decimalPlaces: 0,
+              color: (opacity = 1) => `rgba(0, 102, 204, ${opacity})`, // Azul para barras
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Etiquetas negras
+              style: {
+                borderRadius: 16,
+              },
+            }}
+            verticalLabelRotation={30}
+            fromZero={true}
+            showBarTops={false} // Quitar la línea superior de las barras
+            style={styles.chart}
+          />
+        </View>
+
+        {/* Botón para generar y compartir el PDF del gráfico de barras */}
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Generar y Compartir PDF (Barras)"
+            onPress={() => generarPDF(barChartRef, 'Barras')}
+          />
+        </View>
       </View>
-      <View style={styles.buttonContainer}>
-        <Button title="Generar y Compartir PDF" onPress={generarPDF} />
-      </View>
+
     </ScrollView>
   );
 }
@@ -150,16 +217,26 @@ const chartConfig = {
   },
 };
 
+const barChartConfig = {
+  backgroundColor: "#0067C6",
+  backgroundGradientFrom: "#004c91",
+  backgroundGradientTo: "#0067C6",
+  decimalPlaces: 0,
+  color: (opacity = 1) => `rgba(0, 102, 204, ${opacity})`,  // Cambié a un color neutro para las barras
+  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  style: {
+    borderRadius: 16,
+  },
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 10,
+    padding: 20,
+    backgroundColor: '#D3D3D3', // Fondo gris
   },
   contentContainer: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingTop: 20,
+    paddingBottom: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -169,42 +246,47 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0067C6',
-    textAlign: 'center',
     marginBottom: 20,
   },
   subtitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0067C6',
-    marginVertical: 10,
+    marginBottom: 10,
   },
   chart: {
-    marginVertical: 20,
-    borderRadius: 16,
+    marginVertical: 8,
+  },
+  card: {
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   legendContainer: {
-    marginTop: 20,
-    alignItems: 'flex-start',
-    paddingLeft: 20,
+    marginTop: 10,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginVertical: 5,
   },
   legendColor: {
-    width: 15,
-    height: 15,
-    marginRight: 8,
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    borderRadius: 5,
   },
   legendText: {
     fontSize: 14,
     color: '#333',
   },
   buttonContainer: {
-    marginTop: 20,
-    width: '100%',
-    paddingHorizontal: 10,
+    marginTop: 10,
   },
 });
+
