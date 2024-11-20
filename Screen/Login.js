@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, Image, Alert, Dimensions } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet, Image, Alert, Dimensions, Modal, TouchableWithoutFeedback, FlatList } from 'react-native';
 import { auth } from "../../ExploreNic/database/firebaseconfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import OpciondeCrearUsuario from './OpciondeCrearUsuario';
-
 import { useNavigation } from '@react-navigation/native';
 
 // Obtener dimensiones de la pantalla
@@ -27,16 +25,18 @@ export default function Login() {
     // Validación de campos vacíos
     setEmailError(!email);
     setPasswordError(!password);
-
+  
     if (!email || !password) {
       Alert.alert('Error', 'Por favor, complete todos los campos.');
       return;
     }
-
+  
     try {
       // Iniciar sesión con Firebase Authentication
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('Home'); // Cambiado de 'Home' a 'AgroSense'
+      
+      // Navegar a Home en las pestañas
+      navigation.navigate('MyTabs', { screen: 'Home' });
     } catch (error) {
       console.error('Error en el inicio de sesión:', error);
       Alert.alert('Error', 'No se pudo iniciar sesión. Verifique sus credenciales.');
@@ -47,7 +47,7 @@ export default function Login() {
     <View style={styles.container}>
       {/* Logo agregado */}
       <Image
-        source={require('../IMAGENES/Logo.png')}  // Asegúrate de tener el logo en esta ruta
+        source={require('../IMAGENES/Logo.png')} 
         style={styles.logo}
         resizeMode="contain"
       />
@@ -81,7 +81,7 @@ export default function Login() {
       </View>
 
       {/* Botón de Iniciar */}
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MyTabs')}>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Iniciar</Text>
       </TouchableOpacity>
 
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: width * 10,  // El logo ocupará el 50% del ancho de la pantalla
+    width: width * 0.5,  // El logo ocupará el 50% del ancho de la pantalla
     height: height * 0.3,  // El logo ocupará el 20% de la altura de la pantalla
     marginBottom: height * 0.03,  // Espacio debajo del logo
   },
@@ -131,17 +131,17 @@ const styles = StyleSheet.create({
     borderColor: "red",
   },
 
-  icon: {
-    width: width * 0.06, // Ajuste del tamaño del ícono basado en el ancho de la pantalla
-    height: width * 0.06,
-    marginRight: width * 0.03,
-  },
-
   input: {
     flex: 1,
     height: "100%",
     fontSize: width * 0.04, // Ajuste de tamaño de fuente basado en el ancho de la pantalla
     paddingLeft: 10,
+    color: "#0067C6",
+  },
+
+  inputText: {
+    textAlign: "center",  // Asegura que el texto dentro del botón esté centrado
+    fontSize: width * 0.04, // Ajuste de tamaño de fuente basado en el ancho de la pantalla
     color: "#0067C6",
   },
 
@@ -169,8 +169,35 @@ const styles = StyleSheet.create({
     borderRadius: 45,
   },
 
-  eyeIconImage: {
-    width: width * 0.06, // Ajuste del tamaño del ícono basado en el ancho de la pantalla
-    height: width * 0.06,
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  modalContainer: {
+    width: width * 0.8,
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+
+  modalItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+
+  modalItemText: {
+    fontSize: 16,
+    color: '#0067C6',
   },
 });

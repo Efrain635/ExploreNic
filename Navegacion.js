@@ -1,6 +1,4 @@
 import React from 'react';
-import { View, Image, StyleSheet, Text } from 'react-native';
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,194 +7,116 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-// Iconos
-import Settings from './Screen/Settings'; // Pantalla de Configuración
-import Home from './Screen/Home'; // Pantalla de Home
-import Users from './Screen/Users'; // Pantalla de Usuario
+// Pantallas
+import Settings from './Screen/Settings';
+import Home from './Screen/Home';
+import Users from './Screen/Users';
 import DetailHome from './Screen/DetailHome';
 import AnotherDetailHome from './Screen/AnotherDetailsHome';
-import maps from './Screen/Mapa'; // Pantalla de Maps
+import Maps from './Screen/Mapa';
 import Estadisticas from './Screen/Estadisticas';
-
-// Pantallas
-import Alojamiento from '../ExploreNic/Screen/Alojamiento';  // Pantalla de Servicios de Alojamiento
-import AlquilerCoches from './Screen/AlquilerCoches';  // Pantalla de Servicios de Alquiler de Coches
-import Atracciones from './Screen/Atracciones';  // Pantalla de Servicios de Atracciones
-import Restaurantes from './Screen/Restaurantes';  // Pantalla de Servicios de Restaurantes
-import Bares from './Screen/Bares';  // Pantalla de Servicios de Bares
-import GuiasTurismo from './Screen/GuiasTurismo' //Pantalla de Servicio Turista
-import VerNegocios from './Screen/VerNegocios'
-
-// Principal
-import Login from './Screen/Login'; // Inicio de Sesión
-import CrearUsuario from './Screen/CrearUsuario'; // Crear Usuario
-import OpciondeCrearUsuario from './Screen/OpciondeCrearUsuario'; //Opcion de Registros
-import RegistroNegocio from './Screen/RegistroNegocio'; //Pantalla de Regitro de Negocio
+import Alojamiento from './Screen/Alojamiento';
+import AlquilerCoches from './Screen/AlquilerCoches';
+import Atracciones from './Screen/Atracciones';
+import Restaurantes from './Screen/Restaurantes';
+import Bares from './Screen/Bares';
+import GuiasTurismo from './Screen/GuiasTurismo';
+import VerNegocios from './Screen/VerNegocios';
+import Login from './Screen/Login';
+import CrearUsuario from './Screen/CrearUsuario';
+import OpciondeCrearUsuario from './Screen/OpciondeCrearUsuario';
+import RegistroNegocio from './Screen/RegistroNegocio';
 
 const Tab = createBottomTabNavigator();
 
 function MyTabs() {
   return (
     <Tab.Navigator
-      initialRouteName='Home'
+      initialRouteName="HomeTab"
       screenOptions={{
         tabBarActiveTintColor: 'purple',
       }}
     >
-
-      <Tab.Screen name='Home' component={StackDetailHome}
+      <Tab.Screen
+        name="HomeTab"
+        component={StackDetailHome}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="home" size={30} color="black" />
-          ),
+          tabBarIcon: ({ color }) => <FontAwesome name="home" size={30} color={color} />,
         }}
       />
-
-      <Tab.Screen name='Maps' component={maps}
+      <Tab.Screen
+        name="Maps"
+        component={Maps}
         options={{
           tabBarLabel: 'Mapa',
-          tabBarIcon: ({ color, size }) => (
-            <FontAwesome name="map" size={28} color="black" />
-          ),
-       }}
-     />
-
-      <Tab.Screen name='Estadisticas' component={Estadisticas}
-        options={{
-          tabBarLabel: 'Estadisticas',
-          tabBarIcon: ({ color, size }) => (
-            <AntDesign name="areachart" size={24} color="black" />
-          ),
-       }}
-     />
-
-      <Tab.Screen name='Setting' component={Settings}
-        options={{
-          tabBarLabel: 'Cofiguraión',
-          tabBarIcon: ({ color, size }) => (
-            <Fontisto name="player-settings" size={28} color="black" />
-          ),
+          tabBarIcon: ({ color }) => <FontAwesome name="map" size={28} color={color} />,
         }}
       />
-
-      <Tab.Screen name='Users' component={Users}
+      <Tab.Screen
+        name="Estadisticas"
+        component={Estadisticas}
         options={{
-          tabBarLabel: 'Users',
-          tabBarIcon: ({ color, size }) => (
-            <Feather name="user" size={30} color="black" />
-          ),
+          tabBarLabel: 'Estadísticas',
+          tabBarIcon: ({ color }) => <AntDesign name="areachart" size={24} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          tabBarLabel: 'Configuración',
+          tabBarIcon: ({ color }) => <Fontisto name="player-settings" size={28} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Users"
+        component={Users}
+        options={{
+          tabBarLabel: 'Usuarios',
+          tabBarIcon: ({ color }) => <Feather name="user" size={30} color={color} />,
         }}
       />
     </Tab.Navigator>
   );
 }
 
-const stackLogin = createStackNavigator();
+const StackLogin = createStackNavigator();
 function StackHomeLogin() {
   return (
-    <stackLogin.Navigator initialRouteName='Login'>
-      
-      <stackLogin.Screen
-        name="Login"
-        component={Login}>
-      </stackLogin.Screen>
-
-      <stackLogin.Screen
-        name="MyTabs"
-        component={MyTabs}>
-      </stackLogin.Screen>
-
-      <stackLogin.Screen
-        name="OpciondeCrearUsuario"
-        component={OpciondeCrearUsuario}>
-      </stackLogin.Screen>
-
-      <stackLogin.Screen
-        name="CrearUsuario"
-        component={CrearUsuario}>
-      </stackLogin.Screen>
-
-      <stackLogin.Screen
-        name="RegistroNegocio"
-        component={RegistroNegocio}>
-      </stackLogin.Screen>
-
-    </stackLogin.Navigator>
+    <StackLogin.Navigator initialRouteName="Login">
+      <StackLogin.Screen name="Login" component={Login} />
+      <StackLogin.Screen name="MyTabs" component={MyTabs} />
+      <StackLogin.Screen name="OpciondeCrearUsuario" component={OpciondeCrearUsuario} />
+      <StackLogin.Screen name="CrearUsuario" component={CrearUsuario} />
+      <StackLogin.Screen name="RegistroNegocio" component={RegistroNegocio} />
+    </StackLogin.Navigator>
   );
 }
 
 const DetailHomeNavigator = createStackNavigator();
 function StackDetailHome() {
   return (
-    <DetailHomeNavigator.Navigator
-      initialRouteName='Categorías'>
-      
-      <DetailHomeNavigator.Screen
-        name="Categorías"
-        component={Home}>
-      </DetailHomeNavigator.Screen>
-
-      <DetailHomeNavigator.Screen
-        name="DetailHome"
-        component={DetailHome}>
-      </DetailHomeNavigator.Screen>
-
-      <DetailHomeNavigator.Screen
-        name="AnotherDetailHome"
-        component={AnotherDetailHome}>
-      </DetailHomeNavigator.Screen>
-
-      {/* Añadiendo la pantalla Alojamiento */}
-      <DetailHomeNavigator.Screen
-        name="AlojamientoScreen"
-        component={Alojamiento}>
-      </DetailHomeNavigator.Screen>
-
-      {/* Añadiendo la pantalla Home */}
-      <DetailHomeNavigator.Screen
-        name="AtraccionesScreen"
-        component={Atracciones}>
-      </DetailHomeNavigator.Screen>
-
-      {/* Añadiendo la pantalla Restauranteas */}
-      <DetailHomeNavigator.Screen
-        name="RestaurantesScreen"
-        component={Restaurantes}>
-      </DetailHomeNavigator.Screen>
-
-      {/* Añadiendo la pantalla AlquilerCoches */}
-      <DetailHomeNavigator.Screen
-        name="AlquilerScreen"
-        component={AlquilerCoches}>
-      </DetailHomeNavigator.Screen>
-
-      {/* Añadiendo la pantalla Bares */}
-      <DetailHomeNavigator.Screen
-        name="BaresScreen"
-        component={Bares}>
-      </DetailHomeNavigator.Screen>
-
-      {/* Añadiendo la pantalla turismo */}
-        <DetailHomeNavigator.Screen
-        name="GuiasTurismoScreen"
-        component={GuiasTurismo}>
-      </DetailHomeNavigator.Screen>
-      
-      {/* Añadiendo la pantalla turismo */}
-      <DetailHomeNavigator.Screen
-        name="VerNegociosScreen"
-        component={VerNegocios}>
-      </DetailHomeNavigator.Screen>
-
+    <DetailHomeNavigator.Navigator initialRouteName="Home">
+      <DetailHomeNavigator.Screen name="Home" component={Home} />
+      <DetailHomeNavigator.Screen name="DetailHome" component={DetailHome} />
+      <DetailHomeNavigator.Screen name="AnotherDetailHome" component={AnotherDetailHome} />
+      <DetailHomeNavigator.Screen name="AlojamientoScreen" component={Alojamiento} />
+      <DetailHomeNavigator.Screen name="AtraccionesScreen" component={Atracciones} />
+      <DetailHomeNavigator.Screen name="RestaurantesScreen" component={Restaurantes} />
+      <DetailHomeNavigator.Screen name="AlquilerScreen" component={AlquilerCoches} />
+      <DetailHomeNavigator.Screen name="BaresScreen" component={Bares} />
+      <DetailHomeNavigator.Screen name="GuiasTurismoScreen" component={GuiasTurismo} />
+      <DetailHomeNavigator.Screen name="VerNegociosScreen" component={VerNegocios} />
     </DetailHomeNavigator.Navigator>
   );
 }
 
+
 export default function Navigacion() {
   return (
     <NavigationContainer>
-      <StackHomeLogin/>
+      <StackHomeLogin />
     </NavigationContainer>
   );
 }

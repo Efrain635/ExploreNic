@@ -13,7 +13,7 @@ const AlquilerAutos = () => {
   const fetchAlquileres = async () => {
     setLoading(true);
     try {
-      const querySnapshot = await getDocs(collection(db, 'AlquilerAutos'));
+      const querySnapshot = await getDocs(collection(db, 'Alquiler de coches'));
       const alquileresData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
