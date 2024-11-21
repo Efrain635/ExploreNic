@@ -134,17 +134,25 @@ const styles = StyleSheet.create({
   },
   alquilerContainer: {
     marginBottom: 40,
+    backgroundColor: '#003B73', // Azul oscuro
+    borderRadius: 15,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff',
     marginBottom: 10,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -160,17 +168,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff',
     marginTop: 20,
     marginBottom: 10,
   },
   servicio: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
     marginBottom: 5,
   },
   link: {
-    color: '#0067C6',
+    color: '#00B5E2',
     textDecorationLine: 'underline',
     marginBottom: 20,
   },

@@ -134,17 +134,25 @@ const styles = StyleSheet.create({
   },
   barContainer: {
     marginBottom: 40,
+    backgroundColor: '#003366', // Azul oscuro
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: '#000', // Sombra para darle efecto de profundidad
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 6,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Texto blanco para contraste
     marginBottom: 10,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Texto blanco para contraste
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -160,17 +168,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Texto blanco para contraste
     marginTop: 20,
     marginBottom: 10,
   },
   servicio: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Texto blanco para contraste
     marginBottom: 5,
   },
   link: {
-    color: '#0067C6',
+    color: '#00BFFF', // Azul claro para los enlaces
     textDecorationLine: 'underline',
     marginBottom: 20,
   },

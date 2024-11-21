@@ -38,6 +38,7 @@ export default function RegistroNegocio() {
         ubicacion,
         servicios: serviciosSeleccionados.filter(servicio => servicio !== ''),
         imagenes: imagenes.map(img => img.uri),
+        valoracion: null,  // Agregar campo de valoración vacío
       });
   
       Alert.alert('Éxito', 'Negocio registrado con éxito');

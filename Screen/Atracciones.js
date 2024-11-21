@@ -134,17 +134,24 @@ const styles = StyleSheet.create({
   },
   atraccionContainer: {
     marginBottom: 40,
+    backgroundColor: '#003D73', // Fondo azul oscuro para la tarjeta
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 4,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Texto en blanco para contraste
     marginBottom: 10,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Texto blanco
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -160,17 +167,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Título de secciones en blanco
     marginTop: 20,
     marginBottom: 10,
   },
   servicio: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Texto blanco para los servicios
     marginBottom: 5,
   },
   link: {
-    color: '#0067C6',
+    color: '#fff', // Enlace en blanco
     textDecorationLine: 'underline',
     marginBottom: 20,
   },

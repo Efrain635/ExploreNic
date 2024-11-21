@@ -133,18 +133,26 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   alojamientoContainer: {
-    marginBottom: 40,
+    marginBottom: 20,
+    backgroundColor: '#003D73', // Fondo azul oscuro para la tarjeta
+    borderRadius: 10, // Bordes redondeados para las tarjetas
+    padding: 15, // Relleno dentro de la tarjeta
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 5, // Sombra para efectos 3D en Android
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Color de texto blanco para resaltar sobre el fondo oscuro
     marginBottom: 10,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Color de texto blanco
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -160,17 +168,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Títulos en blanco para contraste con el fondo oscuro
     marginTop: 20,
     marginBottom: 10,
   },
   servicio: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Color de texto blanco para los servicios
     marginBottom: 5,
   },
   link: {
-    color: '#0067C6',
+    color: '#00aaff', // Color de enlace para hacerlo destacar
     textDecorationLine: 'underline',
     marginBottom: 20,
   },

@@ -132,18 +132,26 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   restauranteContainer: {
-    marginBottom: 40,
+    backgroundColor: '#003366', // Fondo azul oscuro
+    padding: 15,
+    marginBottom: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6.68,
+    elevation: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Texto blanco para contrastar con el fondo oscuro
     marginBottom: 10,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Texto blanco para la descripción
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -159,13 +167,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Color blanco para los títulos de sección
     marginTop: 20,
     marginBottom: 10,
   },
   servicio: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Texto blanco para los servicios
     marginBottom: 5,
   },
   link: {

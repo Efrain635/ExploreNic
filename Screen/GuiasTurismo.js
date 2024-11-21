@@ -112,17 +112,24 @@ const styles = StyleSheet.create({
   },
   guiaContainer: {
     marginBottom: 40,
+    backgroundColor: '#003366', // Fondo azul oscuro
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Blanco para contraste
     marginBottom: 10,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Blanco para contraste
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -138,17 +145,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff', // Blanco para contraste
     marginTop: 20,
     marginBottom: 10,
   },
   servicio: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff', // Blanco para contraste
     marginBottom: 5,
   },
   link: {
-    color: '#0067C6',
+    color: '#ffcc00', // Color amarillo para el enlace
     textDecorationLine: 'underline',
     marginBottom: 20,
   },

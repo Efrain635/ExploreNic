@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TextInput, Linking, ActivityIndicator } from 'react-native';
 import { Rating } from 'react-native-ratings';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db } from '../database/firebaseconfig'; // Asegúrate de tener la configuración de Firebase
+import { collection, getDocs, updateDoc, doc, setDoc } from 'firebase/firestore';
+import { db } from '../database/firebaseconfig'; 
 
 const VerNegocios = () => {
   const [negocios, setNegocios] = useState([]);
@@ -19,24 +19,36 @@ const VerNegocios = () => {
         'Atracciones',
         'Restaurantes',
         'Bares',
-        'Guias turísticos'
+        'Guias turísticos',
       ];
 
       let allNegocios = [];
 
+      // Usamos un bucle para obtener los negocios de todas las categorías
       for (let category of categories) {
         const querySnapshot = await getDocs(collection(db, category));
-        const negociosData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          categoria: category,
-          ...doc.data(),
-        }));
+        const negociosData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          
+          // Si no existe la valoración, la agregamos con valor 4
+          if (!data.hasOwnProperty('valoracion')) {
+            setDoc(doc.ref, { valoracion: 4 }, { merge: true }); // Esto agrega el campo en Firebase si no existe
+          }
+
+          return {
+            id: doc.id,
+            categoria: category,
+            valoracion: data.valoracion || 4, // Si no tiene valoracion, se asigna 4
+            ...data,
+          };
+        });
         allNegocios = [...allNegocios, ...negociosData];
       }
 
+      console.log('Negocios obtenidos:', allNegocios);
       setNegocios(allNegocios);
     } catch (error) {
-      console.error("Error al obtener negocios:", error);
+      console.error("Error al obtener negocios:", error.message);
     } finally {
       setLoading(false);
     }
@@ -55,8 +67,10 @@ const VerNegocios = () => {
   const handleRating = async (negocioId, newRating, categoria) => {
     try {
       const negocioRef = doc(db, categoria, negocioId);
+
+      // Actualizamos o agregamos el campo valoracion en el documento
       await updateDoc(negocioRef, {
-        valoracion: newRating, // Actualiza la valoración con la nueva calificación
+        valoracion: newRating, 
       });
     } catch (error) {
       console.error("Error al actualizar la valoración:", error);
@@ -100,7 +114,7 @@ const VerNegocios = () => {
       {renderServicios(item.servicios)}
 
       <Text style={styles.sectionTitle}>Ubicación</Text>
-      <Text style={styles.link} onPress={() => Linking.openURL(item.ubicacion?.googleMapsUrl)}>
+      <Text style={styles.link} onPress={() => Linking.openURL(item.ubicacion.googleMapsUrl)}>
         Ver en Google Maps
       </Text>
 
@@ -148,18 +162,26 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   negocioContainer: {
-    marginBottom: 40,
+    marginBottom: 20,
+    backgroundColor: '#003D73',
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 5,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff',
     marginBottom: 10,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -175,17 +197,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0067C6',
+    color: '#fff',
     marginTop: 20,
     marginBottom: 10,
   },
   servicio: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
     marginBottom: 5,
   },
   link: {
-    color: '#0067C6',
+    color: '#00aaff',
     textDecorationLine: 'underline',
     marginBottom: 20,
   },
