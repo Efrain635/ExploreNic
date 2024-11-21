@@ -1,0 +1,108 @@
+// Authentication del Login con firebase //
+
+email "sebastian123@gmail.com"
+password "Dios500"
+
+email "martines831@gmail.com"
+password "123456"
+
+-> Se puede registrar mas usuarios con "Crear Cuenta de Usuario" del Login para poder acceder a la App <-
+
+
+// Tecnologías utilizadas en el proyecto //
+
+1: React Native con el uso de la V1.94.2 del Visual Studio Code
+2: La App de Expo Go en su V2.31.1
+3. Firebase 
+
+Resumen de las Tecnologías Utilizadas:
+
+1. React Native: Framework para desarrollar aplicaciones móviles multiplataforma (iOS y Android) utilizando JavaScript y React. Se utiliza para crear la interfaz de usuario de la aplicación.
+
+2. Firebase: Plataforma de Google para desarrollar aplicaciones web y móviles. En este caso, se utiliza específicamente Firebase Authentication para manejar el registro y la autenticación de usuarios, permitiendo la creación de cuentas de negocio y creación de colecciones en la base de datos de firebase.
+
+3. Expo Go: Herramienta para facilitar el desarrollo de aplicaciones móviles con React Native, permitiendo la ejecución rápida de código, la visualización en dispositivos y la compilación para producción.
+
+4. JavaScript: Lenguaje de programación principal utilizado para la lógica de la aplicación, la gestión de estado y las interacciones entre componentes.
+
+5. React: Biblioteca de JavaScript para construir interfaces de usuario. Utilizada para gestionar el estado de los formularios de entrada de datos (por ejemplo, nombre, correo electrónico, contraseña) y las interacciones en la aplicación.
+
+6. CSS (a través de StyleSheet de React Native): Para los estilos de la aplicación, permitiendo la personalización de la apariencia de la interfaz de usuario.
+
+7. @react-navigation/native: Permite gestionar la navegación en la aplicación móvil. Facilita el paso entre pantallas y la gestión del historial de navegación.
+
+8. @react-navigation/bottom-tabs: Para crear una barra de navegación con pestañas en la parte inferior de la pantalla, proporcionando una navegación intuitiva entre las pantallas principales de la aplicación.
+
+9. @react-navigation/stack: Para crear una navegación tipo pila (Stack Navigator), permitiendo la navegación entre pantallas con transiciones visuales.
+
+// Librerías que se usaron y importaciones de independencias en el Proyecto //
+
+->Estadisticas<------------------------------------------------------------------------------------------------------------------------------
+
+Resumen de Librerías Externas Usadas:
+
+1. react-native-chart-kit: Para crear gráficos de barras y pastel.
+2. firebase/firestore: Para acceder y obtener datos de la base de datos Firestore.
+3. jspdf: Para generar un archivo PDF.
+4. expo-file-system: Para guardar archivos en el sistema de archivos del dispositivo.
+5. expo-sharing: Para compartir archivos desde la aplicación.
+6. react-native-view-shot: Para capturar imágenes de componentes visuales en la interfaz.
+
+Estas librerías son las herramientas clave utilizadas para la visualización de datos, generación de reportes y su exportación y compartición.
+
+->Registro de negocios<----------------------------------------------------------------------------------------------------------------------
+
+Resumen de Librerías Externas Usadas:
+
+1. react-native: Para crear la interfaz de usuario básica (entradas de texto, botones, listas, etc.).
+2. @react-native-picker/picker: Para el componente de selección de tipo de negocio.
+3. firebase/firestore: Para interactuar con Firestore y agregar el negocio a la base de datos.
+4. react-native-maps: Para mostrar un mapa interactivo y seleccionar una ubicación.
+5. expo-image-picker: Para permitir al usuario seleccionar imágenes para el negocio.
+
+Estas librerías forman la base para registrar un negocio, manejar datos y seleccionar imágenes y ubicaciones en el dispositivo.
+
+->Crear usuario<-----------------------------------------------------------------------------------------------------------------------------
+
+Resumen de Librerías Externas Usadas:
+
+1. react-native: Para crear la interfaz de usuario, incluyendo componentes como TextInput, Text, TouchableOpacity, Modal, FlatList, ScrollView, KeyboardAvoidingView y Platform.
+
+2. firebase/auth: Para gestionar la autenticación de usuarios, específicamente para crear cuentas de usuario con createUserWithEmailAndPassword.
+
+3. firebase/firestore: Para interactuar con Firestore y guardar los datos del usuario (nombre, correo, número de teléfono, etc.).
+
+4. react-native: Para la gestión de la interfaz de usuario y los estilos, incluyendo el uso de Dimensions para obtener el tamaño de la pantalla y adaptar los elementos visuales.
+
+Estas librerías permiten crear una cuenta de usuario en Firebase, validar los campos, y guardar la información del usuario en Firestore.
+
+->La Navegación de la App<-------------------------------------------------------------------------------------------------------------------
+
+Resumen de Librerías Externas Usadas:
+
+1. @react-navigation/native: Biblioteca principal para la navegación en React Native, utilizada para gestionar la navegación entre pantallas en la aplicación.
+
+2. @react-navigation/bottom-tabs: Utilizada para crear una navegación de pestañas en la parte inferior de la pantalla (Tab Navigator).
+
+3. @react-navigation/stack: Usada para crear una pila de navegación (Stack Navigator) que permite navegar entre pantallas con animaciones de transición.
+
+4. @expo/vector-icons/FontAwesome: Proporciona iconos de la librería FontAwesome, utilizados para los íconos de las pestañas en la navegación.
+
+5. @expo/vector-icons/Fontisto: Proporciona iconos de la librería Fontisto, utilizados para personalizar los íconos en la pestaña de configuración.
+
+6. @expo/vector-icons/Feather: Proporciona iconos de la librería Feather, utilizados en la pestaña de usuarios.
+
+7. @expo/vector-icons/AntDesign: Proporciona iconos de la librería AntDesign, usados en la pestaña de estadísticas.
+
+8. React: Biblioteca de JavaScript para crear interfaces de usuario, en combinación con React Native para construir la interfaz de la aplicación.
+
+9. React Native: Framework para el desarrollo de aplicaciones móviles, para crear la interfaz de usuario, manejar eventos y el estado de la aplicación.
+
+10. NavigationContainer: Componente de @react-navigation/native que debe envolver toda la estructura de navegación en una aplicación React Native.
+
+Estas librerías permiten la creación de una navegación fluida en la aplicación con pestañas y pilas de navegación, y añaden iconos para mejorar la experiencia del usuario.
+
+
+
+
+
