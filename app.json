@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ExploreNic",
-    "slug": "ExploreNic",
+    "slug": "appexplorenic",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,10 +18,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.mauricio02.appexplorenic"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b77d09dc-000d-4e55-9492-fe37b7c19f4a"
+      }
+    },
+    "owner": "mauricio02"
   }
 }
